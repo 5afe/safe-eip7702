@@ -1,33 +1,22 @@
-import {
-  time,
-  loadFixture,
-} from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { deployments, ethers } from 'hardhat'
 import { expect } from "chai";
 import hre from "hardhat";
+import { getSafeSingleton, getFallbackHandler, getSafeProxyFactory } from "./utils/setup";
 
 describe("FallbackHandler", function () {
-
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function setup() {
-  
-    const [deployer, user1] = await hre.ethers.getSigners();
-
-    const FallbackHandlerFactory = await hre.ethers.getContractFactory("FallbackHandler");
-    const fallbackHandler = await FallbackHandlerFactory.deploy();
-
-    return { fallbackHandler };
-  }
-
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { fallbackHandler } = await loadFixture(setup);
-
-      expect(await fallbackHandler.accountId()).to.equal("");
+    const setupTests = deployments.createFixture(async ({ deployments }) => {
+        await deployments.fixture();
+        const fallbackHandler = await getFallbackHandler();
+        const safeProxyFactory = await getSafeProxyFactory();
+        const safeSingleton = await getSafeSingleton();
+        return { fallbackHandler, safeProxyFactory, safeSingleton };
     });
 
-  });
-
+    describe("Deployment", function () {
+        it("Test", async function () {
+            const { fallbackHandler } = await setupTests();
+            expect(await fallbackHandler.accountId()).to.equal("");
+        });
+    });
 });
