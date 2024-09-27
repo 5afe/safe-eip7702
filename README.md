@@ -12,3 +12,7 @@ A POC for ERC-Interoperable Delegated Account
 ```bash
     pnpm test
 ```
+
+### Useful links
+
+- [Pectra Faucet](https://faucet.pectra-devnet-3.ethpandaops.io/)

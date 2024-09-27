@@ -1,0 +1,80 @@
+{
+  "address": "0x1cd4b3dC8e6a2308F7987303d421505968a542Dc",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "accountId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "accountStorageBases",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "onRedelegation",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xad975d3104f32ebc2825a8aa0dd63ab9c78193df94069ed48bf9128d818ea25f",
+  "receipt": {
+    "to": null,
+    "from": "0x779F8fcbd0227f5874576605243Cb06D3Bf62768",
+    "contractAddress": "0x1cd4b3dC8e6a2308F7987303d421505968a542Dc",
+    "transactionIndex": 0,
+    "gasUsed": "175687",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x30ea1943c724f76c4a3a5ab44de4b536a371f9d77b2646d1b63a49a67ea8a81c",
+    "transactionHash": "0xad975d3104f32ebc2825a8aa0dd63ab9c78193df94069ed48bf9128d818ea25f",
+    "logs": [],
+    "blockNumber": 91361,
+    "cumulativeGasUsed": "175687",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "80a75d98b002b5239cdd5ff21d8cb4cf",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.27+commit.40a35a09\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"accountId\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"accountStorageBases\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"onRedelegation\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/FallbackHandler.sol\":\"FallbackHandler\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000000},\"remappings\":[],\"viaIR\":true},\"sources\":{\"contracts/FallbackHandler.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity ^0.8.27;\\n\\nimport {IInteroperableDelegatedAccount} from \\\"./interfaces/IInteroperableDelegatedAccount.sol\\\";\\n\\ncontract FallbackHandler is IInteroperableDelegatedAccount {\\n    function accountId() external view returns (string memory) {\\n        return \\\"\\\";\\n    }\\n\\n    function accountStorageBases() external view returns (bytes32[] memory) {\\n        return new bytes32[](0);\\n    }\\n\\n    function onRedelegation() external returns (bool) {\\n        return true;\\n    }\\n}\\n\",\"keccak256\":\"0x71c3e3a9ea7c8302735c2b752cd84b7efbbb7f9abe0c7607105bc6b7a785233c\",\"license\":\"LGPL-3.0-only\"},\"contracts/interfaces/IInteroperableDelegatedAccount.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity ^0.8.27;\\n\\ninterface IInteroperableDelegatedAccount {\\n    /*\\n     * @dev    Provides the namespace of the account.\\n     *         namespace of accounts can possibly include, account version, account name, wallet vendor name, etc\\n     * @notice this standard does not standardize the namespace format\\n     * e.g.,   \\\"v0.1.2.7702Account.WalletProjectA\\\"\\n     */\\n    function accountId() external view returns (string memory);\\n\\n    /*\\n     * @dev    Externally shares the storage base of the account.\\n     *         Majority of 7702 accounts will have their distinctive storage base to reduce the chance of storage collision.\\n     *         This allows the external entities to know what the storage base is of the account.\\n     *         Wallets willing to redelegate already-delegated accounts should call accountStorageBase() to check if it confirms with the account it plans to redelegate.\\n     *\\n     *         The bytes32 array should be stored at the storage slot: keccak(keccak('InteroperableDelegatedAccount.ERC.Storage')-1) & ~0xff\\n     *         This is an append-only array so newly redelegated accounts should not overwrite the storage at this slot, but just append their base to the array.\\n     *         This append operation should be done during the initialization of the account.\\n     */\\n    function accountStorageBases() external view returns (bytes32[] memory);\\n\\n    /*\\n     * @dev    Function called before redelegation.\\n     *         This function should prepare the account for a delegation to a different implementation.\\n     *         This function could be triggered by the new wallet that wants to redelegate an already delegated EOA.\\n     *         It should uninitialize storages if needed and execute wallet-specific logic to prepare for redelegation.\\n     *         msg.sender should be the owner of the account.\\n     */\\n    function onRedelegation() external returns (bool);\\n}\\n\",\"keccak256\":\"0x44e0a79d62c8d7cf5f737848a957e382757518683f5d9fdbb97c46408c7ce6c3\",\"license\":\"LGPL-3.0-only\"}},\"version\":1}",
+  "bytecode": "0x60808060405234601557610238908161001b8239f35b600080fdfe608080604052600436101561001357600080fd5b60003560e01c908163492a88a2146101ca575080638626e88b1461013157639cfd7cff1461004057600080fd5b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c576040516020810181811067ffffffffffffffff8211176100fd576040526000815260405190602082528181519182602083015260005b8381106100e55750507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f836000604080968601015201168101030190f35b602082820181015160408784010152859350016100a5565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600080fd5b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c5760206040518181019080821067ffffffffffffffff8311176100fd579080604052600082526000368137604051928392818401908285525180915260408401929160005b8281106101b357505050500390f35b8351855286955093810193928101926001016101a4565b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c5780600160209252f3fea26469706673582212205f5b41a548282c380d65065295162bc8ec2d6632b759b0ef675364bb98d2e98864736f6c634300081b0033",
+  "deployedBytecode": "0x608080604052600436101561001357600080fd5b60003560e01c908163492a88a2146101ca575080638626e88b1461013157639cfd7cff1461004057600080fd5b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c576040516020810181811067ffffffffffffffff8211176100fd576040526000815260405190602082528181519182602083015260005b8381106100e55750507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f836000604080968601015201168101030190f35b602082820181015160408784010152859350016100a5565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600080fd5b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c5760206040518181019080821067ffffffffffffffff8311176100fd579080604052600082526000368137604051928392818401908285525180915260408401929160005b8281106101b357505050500390f35b8351855286955093810193928101926001016101a4565b3461012c5760007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261012c5780600160209252f3fea26469706673582212205f5b41a548282c380d65065295162bc8ec2d6632b759b0ef675364bb98d2e98864736f6c634300081b0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
