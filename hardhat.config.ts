@@ -42,9 +42,9 @@ const compilerSettings = {
             enabled: true,
             runs: 10_000_000,
         },
-        viaIR: true,
+        viaIR: false,
         evmVersion: "paris",
-    },
+    }
 };
 
 const config: HardhatUserConfig = {
@@ -57,8 +57,11 @@ const config: HardhatUserConfig = {
     networks: {
         localhost: {
             url: "http://localhost:8545",
+            allowUnlimitedContractSize: true
         },
-        hardhat: {},
+        hardhat: {
+            allowUnlimitedContractSize: true
+        },
         sepolia: {
             ...sharedNetworkConfig,
             url: "https://rpc.ankr.com/eth_sepolia",
@@ -66,8 +69,8 @@ const config: HardhatUserConfig = {
         pectra:{
             ...sharedNetworkConfig,
             url: "https://rpc.pectra-devnet-3.ethpandaops.io",
-            gasPrice: 5_000_000_000,
-            gas: 500_000_000,
+            gasPrice: 50_000_000_000,
+            gas: 1_000_000_000,
             timeout: 100000000,
         },
         ...customNetwork,

@@ -8,7 +8,28 @@ const deploy: DeployFunction = async ({ deployments, getNamedAccounts, network }
     const { deployer } = await getNamedAccounts();
     const { deploy } = deployments;
 
-    await deploy("FallbackHandler", {
+    await deploy("IDAFallbackHandler", {
+        from: deployer,
+        args: [],
+        log: true,
+        deterministicDeployment: true,
+    });
+
+    await deploy("SafeModuleSetup", {
+        from: deployer,
+        args: [],
+        log: true,
+        deterministicDeployment: true,
+    });
+
+    await deploy("SafeERC7702ProxyFactory", {
+        from: deployer,
+        args: [],
+        log: true,
+        deterministicDeployment: true,
+    });
+
+    await deploy("ClearStorageHelper", {
         from: deployer,
         args: [],
         log: true,
