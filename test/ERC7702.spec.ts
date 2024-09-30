@@ -53,13 +53,14 @@ describe("FallbackHandler", () => {
             delegator,
             clearStorageHelper,
             safeModuleSetup,
-            safeERC7702ProxyFactory
+            safeERC7702ProxyFactory,
         };
     });
 
     describe("Authorize Tx", function () {
         it.only("Give authority to Safe", async () => {
-            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeERC7702ProxyFactory } = await setupTests();
+            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeERC7702ProxyFactory } =
+                await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
 
@@ -86,13 +87,15 @@ describe("FallbackHandler", () => {
 
             const SETUP_DATA_HASH = ethers.keccak256(data);
             console.log("SETUP_DATA_HASH", SETUP_DATA_HASH);
-            
+
             const proxyAddress = await calculateProxyAddress(safeERC7702ProxyFactory, await safeSingleton.getAddress(), data, 0);
-            const isContract = (await ethers.provider.getCode(proxyAddress)) === "0x"? false: true;
-            
-            if(!isContract) {
+            const isContract = (await ethers.provider.getCode(proxyAddress)) === "0x" ? false : true;
+
+            if (!isContract) {
                 console.log("Deploying Proxy");
-                const proxy = await safeERC7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
+                const proxy = await safeERC7702ProxyFactory
+                    .connect(deployer)
+                    .createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
                 expect(proxy).to.equal(proxyAddress);
             }
 
@@ -250,7 +253,6 @@ describe("FallbackHandler", () => {
             // const log = txReceipt?.logs.find((log: any) => log.address === fallbackHandlerAddress);
             // expect(log && fallbackHandler.interface.parseLog(log)?.name === "OnRedelegation");
 
-
             // expect(await ethers.provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(
             //     ethers.ZeroHash,
             // );
@@ -260,10 +262,9 @@ describe("FallbackHandler", () => {
             // expect(await ethers.provider.getStorage(account, 3)).to.equal(ethers.ZeroAddress);
             // // Threshold
             // expect(await ethers.provider.getStorage(account, 4)).to.equal(ethers.ZeroAddress);
-            
+
             await printAccountStorage(ethers.provider, account, safeSingleton.target);
         });
-
     });
 });
 

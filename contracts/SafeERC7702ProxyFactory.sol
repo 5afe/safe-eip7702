@@ -24,7 +24,11 @@ contract SafeERC7702ProxyFactory {
     function deployProxy(address _singleton, bytes memory initializer, bytes32 salt) internal returns (SafeERC7702Proxy proxy) {
         require(isContract(_singleton), "Singleton contract not deployed");
 
-        bytes memory deploymentData = abi.encodePacked(type(SafeERC7702Proxy).creationCode, uint256(keccak256(initializer)), uint256(uint160(_singleton)));
+        bytes memory deploymentData = abi.encodePacked(
+            type(SafeERC7702Proxy).creationCode,
+            uint256(keccak256(initializer)),
+            uint256(uint160(_singleton))
+        );
         // solhint-disable-next-line no-inline-assembly
         assembly {
             proxy := create2(0x0, add(0x20, deploymentData), mload(deploymentData), salt)

@@ -41,4 +41,4 @@ export const getSafeModuleSetup = async () => {
 export const getSafeERC7702ProxyFactory = async () => {
     const safeERC7702ProxyFactory = await hre.deployments.get("SafeERC7702ProxyFactory");
     return ethers.getContractAt("SafeERC7702ProxyFactory", safeERC7702ProxyFactory.address);
-}
+};

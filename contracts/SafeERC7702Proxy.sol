@@ -3,7 +3,6 @@ pragma solidity 0.8.27;
 import {SafeProxy} from "@safe-global/safe-contracts/contracts/proxies/SafeProxy.sol";
 
 contract SafeERC7702Proxy is SafeProxy {
-
     bytes32 internal immutable SETUP_DATA_HASH;
     address internal immutable SINGLETON;
     constructor(bytes32 setupData, address singleton) SafeProxy(singleton) {
@@ -25,7 +24,7 @@ contract SafeERC7702Proxy is SafeProxy {
 
         singleton = SINGLETON;
 
-         // solhint-disable-next-line no-inline-assembly
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             let _singleton := and(sload(0), 0xffffffffffffffffffffffffffffffffffffffff)
             calldatacopy(0, 0, calldatasize())
@@ -36,6 +35,5 @@ contract SafeERC7702Proxy is SafeProxy {
             }
             return(0, returndatasize())
         }
-        
     }
 }
