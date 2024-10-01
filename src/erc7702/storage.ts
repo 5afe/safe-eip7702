@@ -1,18 +1,20 @@
-import { AddressLike, ethers, Provider } from "ethers";
+import { AddressLike, Provider } from "ethers";
+import { ACCOUNT_CODE_PREFIX } from "./helper";
+import { ethers } from "hardhat";
 
-export const readModuleStorageSlot = async (provider: Provider, account: AddressLike, key: string) => {
-    const moduleStorageSlot = 1n;
-    return await readMappingStorage(provider, account, moduleStorageSlot, key);
+export const isAccountDelegated = async (provider: Provider, account: AddressLike) => {
+    const codeAtEOA = await provider.getCode(account);
+    return codeAtEOA.length === 48 && codeAtEOA.startsWith(ACCOUNT_CODE_PREFIX);
 };
 
-export const readOwnerStorageSlot = async (provider: Provider, account: AddressLike, key: string) => {
-    const ownerStorageSlot = 2n;
-    return await readMappingStorage(provider, account, ownerStorageSlot, key);
+export const isAccountDelegatedToAddress = async (provider: Provider, account: AddressLike, authority: string) => {
+    const codeAtEOA = await provider.getCode(account);
+    return (
+        codeAtEOA.length === 48 && codeAtEOA.startsWith(ACCOUNT_CODE_PREFIX) && ethers.getAddress("0x" + codeAtEOA.slice(8)) === authority
+    );
 };
 
-export const readMappingStorage = async (provider: Provider, account: AddressLike, storageSlot: bigint, key: string) => {
-    const paddedKey = ethers.zeroPadValue(key, 32);
-    const baseSlot = ethers.zeroPadValue(ethers.toBeHex(storageSlot), 32);
-    const slot = ethers.keccak256(ethers.concat([paddedKey, baseSlot]));
-    return await provider.getStorage(account, slot);
+export const getDelegatedToAddress = async (provider: Provider, account: AddressLike, authority: string): Promise<string> => {
+    const codeAtEOA = await provider.getCode(account);
+    return "0x" + codeAtEOA.slice(8);
 };

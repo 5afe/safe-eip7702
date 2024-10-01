@@ -1,6 +1,6 @@
 import { accessListify, AccessListish, BigNumberish, concat, encodeRlp, getBigInt, Signature, toBeArray } from "ethers";
 
-export type AuthorizationListEntryAny = { chainId: any; address: any; nonce: any; yParity: any; r: any; s: any };
+export type AuthorizationListEntryAny = { chainId: bigint; address: string; nonce: bigint; yParity: any; r: any; s: any };
 
 export type AuthorizationListEntry = {
     chainId: Uint8Array;

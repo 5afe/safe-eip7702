@@ -5,22 +5,26 @@ import {SafeProxy} from "@safe-global/safe-contracts/contracts/proxies/SafeProxy
 contract SafeERC7702Proxy is SafeProxy {
     bytes32 internal immutable SETUP_DATA_HASH;
     address internal immutable SINGLETON;
-    constructor(bytes32 setupData, address singleton) SafeProxy(singleton) {
-        SETUP_DATA_HASH = setupData;
+
+    error InvalidSetupData(bytes32 expectedHash, bytes32 receivedHash);
+
+    constructor(bytes32 setupDataHash, address singleton) SafeProxy(singleton) {
+        SETUP_DATA_HASH = setupDataHash;
         SINGLETON = singleton;
     }
 
     function setup(
-        address[] calldata _owners,
-        uint256 _threshold,
-        address to,
-        bytes calldata data,
-        address fallbackHandler,
-        address paymentToken,
-        uint256 payment,
-        address payable paymentReceiver
+        address[] calldata /*_owners*/,
+        uint256 /*_threshold*/,
+        address /*to*/,
+        bytes calldata /*data*/,
+        address /*fallbackHandler*/,
+        address /*paymentToken*/,
+        uint256 /*payment*/,
+        address payable /*paymentReceiver*/
     ) external {
-        require(keccak256(msg.data) == SETUP_DATA_HASH, "Invalid setup data");
+        bytes32 hash = keccak256(msg.data);
+        require(hash == SETUP_DATA_HASH, InvalidSetupData(SETUP_DATA_HASH, hash));
 
         singleton = SINGLETON;
 

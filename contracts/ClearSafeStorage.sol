@@ -62,7 +62,7 @@ contract ClearSafeStorage is SafeStorage {
 
     function _clearSafeStorage() internal {
         // slot 0
-        // singleton = address(0);
+        singleton = address(0);
         // slot 1
         _removeAllModules();
         // clears slot 2 owners mapping
@@ -86,7 +86,7 @@ contract ClearSafeStorage is SafeStorage {
         /* solhint-disable no-inline-assembly */
         /// @solidity memory-safe-assembly
         assembly {
-            sstore(FALLBACK_HANDLER_STORAGE_SLOT, 0x01)
+            sstore(FALLBACK_HANDLER_STORAGE_SLOT, 0)
         }
         /* solhint-enable no-inline-assembly */
 
