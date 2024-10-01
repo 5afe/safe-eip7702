@@ -14,7 +14,7 @@ importers:
     devDependencies:
       '@nomicfoundation/hardhat-toolbox':
         specifier: ^5.0.0
-        version: 5.0.0(okcgomxy3k33dj5vhnokxvvala)
+        version: 5.0.0(nhqfi53kg5jjfevrl7fejkmlaa)
       '@nomiclabs/hardhat-ethers':
         specifier: ^2.2.3
         version: 2.2.3(ethers@6.13.2)(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2))
@@ -551,8 +551,8 @@ packages:
   '@types/chai-as-promised@7.1.8':
     resolution: {integrity: sha512-ThlRVIJhr69FLlh6IctTXFkmhtP3NpMZ2QGq69StYLyKZFp/HOp1VdKZj7RvfNWYYcJ1xlbLGLLWj1UvP5u/Gw==}
 
-  '@types/chai@4.3.20':
-    resolution: {integrity: sha512-/pC9HAB5I/xMlc5FP77qjCnI16ChlJfW0tGa0IUcFn38VJrTV6DeZ60NU5KZBtaOZqjdpwTWohz5HU1RrhiYxQ==}
+  '@types/chai@5.0.0':
+    resolution: {integrity: sha512-+DwhEHAaFPPdJ2ral3kNHFQXnTfscEEFsUxzD+d7nlcLrFK23JtNjH71RGasTcHb88b4vVi4mTyfpf8u2L8bdA==}
 
   '@types/concat-stream@1.6.1':
     resolution: {integrity: sha512-eHE4cQPoj6ngxBZMvVf6Hw7Mh4jMW4U9lpGmS5GBPB9RYxlFg+CHaVN7ErNY4W9XfLIEn20b4VDYaIrbq0q4uA==}
@@ -3050,7 +3050,7 @@ snapshots:
       ethereumjs-util: 7.1.5
       hardhat: 2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2)
 
-  '@nomicfoundation/hardhat-toolbox@5.0.0(okcgomxy3k33dj5vhnokxvvala)':
+  '@nomicfoundation/hardhat-toolbox@5.0.0(nhqfi53kg5jjfevrl7fejkmlaa)':
     dependencies:
       '@nomicfoundation/hardhat-chai-matchers': 2.0.8(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2)(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2)))(chai@4.5.0)(ethers@6.13.2)(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2))
       '@nomicfoundation/hardhat-ethers': 3.0.8(ethers@6.13.2)(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2))
@@ -3059,7 +3059,7 @@ snapshots:
       '@nomicfoundation/hardhat-verify': 2.0.11(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2))
       '@typechain/ethers-v6': 0.5.1(ethers@6.13.2)(typechain@8.3.2(typescript@5.6.2))(typescript@5.6.2)
       '@typechain/hardhat': 9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.13.2)(typechain@8.3.2(typescript@5.6.2))(typescript@5.6.2))(ethers@6.13.2)(hardhat@2.22.12(ts-node@10.9.2(@types/node@22.7.2)(typescript@5.6.2))(typescript@5.6.2))(typechain@8.3.2(typescript@5.6.2))
-      '@types/chai': 4.3.20
+      '@types/chai': 5.0.0
       '@types/mocha': 10.0.8
       '@types/node': 22.7.2
       chai: 4.5.0
@@ -3277,9 +3277,9 @@ snapshots:
 
   '@types/chai-as-promised@7.1.8':
     dependencies:
-      '@types/chai': 4.3.20
+      '@types/chai': 5.0.0
 
-  '@types/chai@4.3.20': {}
+  '@types/chai@5.0.0': {}
 
   '@types/concat-stream@1.6.1':
     dependencies:

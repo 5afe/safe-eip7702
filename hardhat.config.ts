@@ -7,17 +7,23 @@ import { HttpNetworkUserConfig } from "hardhat/types";
 
 dotenv.config();
 
-const { CUSTOM_NODE_URL, MNEMONIC, ETHERSCAN_API_KEY, PK } = process.env;
+const { CUSTOM_NODE_URL } = process.env;
 
-const DEFAULT_MNEMONIC = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
+// const DEFAULT_MNEMONIC = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
+// Function to get all keys matching the pattern PK{number}
+const getPrivateKeys = () => {
+    return Object.keys(process.env)
+        .filter(key => /^PK\d+$/.test(key))
+        .map(key => process.env[key] as string);
+};
+
+const privateKeys = getPrivateKeys();
 
 const sharedNetworkConfig: HttpNetworkUserConfig = {};
-if (PK) {
-    sharedNetworkConfig.accounts = [PK];
+if (privateKeys.length >= 3) {
+    sharedNetworkConfig.accounts = privateKeys;
 } else {
-    sharedNetworkConfig.accounts = {
-        mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
-    };
+    throw new Error("At least 3 private keys must be provided in .env");
 }
 
 const customNetwork = CUSTOM_NODE_URL
@@ -36,9 +42,9 @@ const compilerSettings = {
             enabled: true,
             runs: 10_000_000,
         },
-        viaIR: true,
+        viaIR: false,
         evmVersion: "paris",
-    },
+    }
 };
 
 const config: HardhatUserConfig = {
@@ -51,11 +57,21 @@ const config: HardhatUserConfig = {
     networks: {
         localhost: {
             url: "http://localhost:8545",
+            allowUnlimitedContractSize: true
         },
-        hardhat: {},
+        hardhat: {
+            allowUnlimitedContractSize: true
+        },
         sepolia: {
             ...sharedNetworkConfig,
             url: "https://rpc.ankr.com/eth_sepolia",
+        },
+        pectra:{
+            ...sharedNetworkConfig,
+            url: "https://rpc.pectra-devnet-3.ethpandaops.io",
+            gasPrice: 50_000_000_000,
+            gas: 1_000_000_000,
+            timeout: 100000000,
         },
         ...customNetwork,
     },
@@ -64,6 +80,9 @@ const config: HardhatUserConfig = {
     },
     namedAccounts: {
       deployer: 0,
+    },
+    mocha: {
+        timeout: 100000000
     },
 };
 
