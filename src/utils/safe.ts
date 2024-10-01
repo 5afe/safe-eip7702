@@ -22,10 +22,6 @@ export const execTransaction = async (
     comparableArray.sort((a, b) => a[0].toString().localeCompare(b[0].toString(), "en", { sensitivity: "base" }));
     const sorted: Signer[] = comparableArray.map((x) => x[1] as Signer);
 
-    //   const sorted = Array.from(wallets).sort((a: Signer, b: Signer) => {
-    //     return a.address.localeCompare(b.address, "en", { sensitivity: "base" });
-    //   });
-
     for (let i = 0; i < sorted.length; i++) {
         let flatSig = (await sorted[i].signMessage(bytesDataHash)).replace(/1b$/, "1f").replace(/1c$/, "20");
         signatureBytes += flatSig.slice(2);
