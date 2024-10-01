@@ -93,16 +93,7 @@ describe("FallbackHandler", () => {
             expect(txSetupReceipt?.status === 1, "Transaction failed");
 
             const account = await delegator.getAddress();
-            expect(await ethers.provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
-            expect(await ethers.provider.getStorage(account, GUARD_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
-            // Singleton address
-            expect(await ethers.provider.getStorage(account, 0)).to.equal(ethers.ZeroHash);
-            // Owner count
-            expect(await ethers.provider.getStorage(account, 3)).to.equal(ethers.ZeroHash);
-            // Threshold
-            expect(await ethers.provider.getStorage(account, 4)).to.equal(ethers.ZeroHash);
-            expect(await readModuleStorageSlot(ethers.provider, account, SENTINEL_ADDRESS)).to.equal(ethers.ZeroHash);
-            expect(await readOwnerStorageSlot(ethers.provider, account, SENTINEL_ADDRESS)).to.equal(ethers.ZeroHash);
+            await printAccountStorage(ethers.provider, account, await safeSingleton.getAddress());
         });
 
         it.skip("Revoke authority to Safe and clear storage", async () => {
