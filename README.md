@@ -21,6 +21,10 @@ Using this contract, the following storage slots associated with Safe can be cle
 
 __Note:__ This contract does not implement any verification logic.
 
+## TODO
+
+- Restore nonce after re-delegation back to SafeProxy
+
 ## Install
 
 ```bash
