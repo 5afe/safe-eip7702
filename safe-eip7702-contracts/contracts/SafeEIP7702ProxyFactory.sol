@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity 0.8.27;
 
-import {SafeERC7702Proxy} from "./SafeERC7702Proxy.sol";
+import {SafeEIP7702Proxy} from "./SafeEIP7702Proxy.sol";
 
 /**
- * @title Safe ERC7702 Proxy Factory - Allows to create a new proxy contract and execute a message call to the new proxy within one transaction.
+ * @title Safe EIP7702 Proxy Factory - Allows to create a new proxy contract and execute a message call to the new proxy within one transaction.
  */
-contract SafeERC7702ProxyFactory {
-    event ProxyCreation(SafeERC7702Proxy indexed proxy, address singleton);
+contract SafeEIP7702ProxyFactory {
+    event ProxyCreation(SafeEIP7702Proxy indexed proxy, address singleton);
 
     /// @dev Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address.
     function proxyCreationCode() public pure returns (bytes memory) {
-        return type(SafeERC7702Proxy).creationCode;
+        return type(SafeEIP7702Proxy).creationCode;
     }
 
     /**
@@ -21,11 +21,11 @@ contract SafeERC7702ProxyFactory {
      * @param salt Create2 salt to use for calculating the address of the new proxy contract.
      * @return proxy Address of the new proxy contract.
      */
-    function deployProxy(address _singleton, bytes memory initializer, bytes32 salt) internal returns (SafeERC7702Proxy proxy) {
+    function deployProxy(address _singleton, bytes memory initializer, bytes32 salt) internal returns (SafeEIP7702Proxy proxy) {
         require(isContract(_singleton), "Singleton contract not deployed");
 
         bytes memory deploymentData = abi.encodePacked(
-            type(SafeERC7702Proxy).creationCode,
+            type(SafeEIP7702Proxy).creationCode,
             uint256(keccak256(initializer)),
             uint256(uint160(_singleton))
         );
@@ -51,7 +51,7 @@ contract SafeERC7702ProxyFactory {
      * @param initializer Payload for a message call to be sent to a new proxy contract.
      * @param saltNonce Nonce that will be used to generate the salt to calculate the address of the new proxy contract.
      */
-    function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) public returns (SafeERC7702Proxy proxy) {
+    function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) public returns (SafeEIP7702Proxy proxy) {
         // If the initializer changes the proxy address should change too. Hashing the initializer data is cheaper than just concatinating it
         bytes32 salt = keccak256(abi.encodePacked(keccak256(initializer), saltNonce));
         proxy = deployProxy(_singleton, initializer, salt);
@@ -70,7 +70,7 @@ contract SafeERC7702ProxyFactory {
         address _singleton,
         bytes memory initializer,
         uint256 saltNonce
-    ) public returns (SafeERC7702Proxy proxy) {
+    ) public returns (SafeEIP7702Proxy proxy) {
         // If the initializer changes the proxy address should change too. Hashing the initializer data is cheaper than just concatinating it
         bytes32 salt = keccak256(abi.encodePacked(keccak256(initializer), saltNonce, getChainId()));
         proxy = deployProxy(_singleton, initializer, salt);

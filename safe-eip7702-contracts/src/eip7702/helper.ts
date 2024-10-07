@@ -1,6 +1,6 @@
 import { ethers, keccak256, Provider, Signer, SigningKey } from "ethers";
 import { AuthorizationListEntryAny, encodeRLPAuthorizationEntryUnsigned, serializeEip7702 } from "../utils/encodeRLP";
-import { SafeERC7702ProxyFactory } from "../../typechain-types";
+import { SafeEIP7702ProxyFactory } from "../../typechain-types";
 
 export const getAuthorizationList = (
     chainId: bigint,
@@ -55,7 +55,7 @@ export const getSignedTransaction = async (
 };
 
 export const calculateProxyAddress = async (
-    factory: SafeERC7702ProxyFactory,
+    factory: SafeEIP7702ProxyFactory,
     singleton: string,
     inititalizer: string,
     nonce: number | string,

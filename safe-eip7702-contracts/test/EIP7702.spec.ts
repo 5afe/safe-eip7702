@@ -3,7 +3,7 @@ import hre from "hardhat";
 import {
     getSafeSingleton,
     getIDAFallbackHandler,
-    getSafeERC7702ProxyFactory,
+    getSafeEIP7702ProxyFactory,
     getCompatibilityFallbackHandler,
     getSafeAtAddress,
     getClearStorageHelper,
@@ -12,12 +12,12 @@ import {
 import { AddressLike, SigningKey } from "ethers";
 import { execTransaction, getSetupData, GUARD_STORAGE_SLOT, readModuleStorageSlot, readOwnerStorageSlot } from "../src/utils/safe";
 import { expect } from "chai";
-import { ACCOUNT_CODE_PREFIX, calculateProxyAddress, getAuthorizationList, getSignedTransaction } from "../src/erc7702/helper";
+import { ACCOUNT_CODE_PREFIX, calculateProxyAddress, getAuthorizationList, getSignedTransaction } from "../src/eip7702/helper";
 import { FALLBACK_HANDLER_STORAGE_SLOT, SENTINEL_ADDRESS } from "../src/utils/safe";
-import { SafeERC7702ProxyFactory } from "../typechain-types";
-import { isAccountDelegatedToAddress } from "../src/erc7702/storage";
+import { SafeEIP7702ProxyFactory } from "../typechain-types";
+import { isAccountDelegatedToAddress } from "../src/eip7702/storage";
 
-describe("ERC7702", () => {
+describe("EIP7702", () => {
     const setupTests = deployments.createFixture(async ({ deployments }) => {
         await deployments.fixture();
         const [deployer, relayer, delegator] = await ethers.getSigners();
@@ -26,7 +26,7 @@ describe("ERC7702", () => {
         const safeCompatibilityFallbackHandler = await getCompatibilityFallbackHandler();
         const clearStorageHelper = await getClearStorageHelper();
         const safeModuleSetup = await getSafeModuleSetup();
-        const safeERC7702ProxyFactory: SafeERC7702ProxyFactory = await getSafeERC7702ProxyFactory();
+        const safeEIP7702ProxyFactory: SafeEIP7702ProxyFactory = await getSafeEIP7702ProxyFactory();
         return {
             fallbackHandler,
             safeSingleton,
@@ -36,7 +36,7 @@ describe("ERC7702", () => {
             delegator,
             clearStorageHelper,
             safeModuleSetup,
-            safeERC7702ProxyFactory,
+            safeEIP7702ProxyFactory,
         };
     });
 
@@ -55,9 +55,9 @@ describe("ERC7702", () => {
         expect(await readOwnerStorageSlot(ethers.provider, account, SENTINEL_ADDRESS)).to.equal(ethers.ZeroHash);
     };
 
-    describe("Test SafeERC7702Proxy", function () {
-        it("Give authority to SafeERC7702Proxy", async () => {
-            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeERC7702ProxyFactory } =
+    describe("Test SafeEIP7702Proxy", function () {
+        it("Give authority to SafeEIP7702Proxy", async () => {
+            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeEIP7702ProxyFactory } =
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
@@ -73,12 +73,12 @@ describe("ERC7702", () => {
             const fallbackHandlerAddress = await fallbackHandler.getAddress();
             const data = getSetupData(owners, 1, await safeModuleSetup.getAddress(), [fallbackHandlerAddress], fallbackHandlerAddress);
 
-            const proxyAddress = await calculateProxyAddress(safeERC7702ProxyFactory, await safeSingleton.getAddress(), data, 0);
+            const proxyAddress = await calculateProxyAddress(safeEIP7702ProxyFactory, await safeSingleton.getAddress(), data, 0);
             const isContract = (await ethers.provider.getCode(proxyAddress)) === "0x" ? false : true;
 
             if (!isContract) {
                 console.log("Deploying Proxy");
-                await safeERC7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
+                await safeEIP7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
             } else {
                 console.log("Proxy already deployed");
             }
@@ -110,7 +110,6 @@ describe("ERC7702", () => {
             expect(txSetupReceipt?.status === 1, "Transaction failed");
 
             const account = await delegator.getAddress();
-            console.log("ethers.zeroPadValue(fallbackHandlerAddress, 32): ", ethers.zeroPadValue(fallbackHandlerAddress, 32));
             expect(await ethers.provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(
                 ethers.zeroPadValue(fallbackHandlerAddress, 32),
             );
@@ -160,7 +159,7 @@ describe("ERC7702", () => {
         });
 
         it("Clear storage using onRedelegation()", async () => {
-            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeERC7702ProxyFactory } =
+            const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeEIP7702ProxyFactory } =
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
@@ -186,11 +185,11 @@ describe("ERC7702", () => {
                 fallbackHandlerAddress,
             );
 
-            const proxyAddress = await calculateProxyAddress(safeERC7702ProxyFactory, await safeSingleton.getAddress(), setupData, 0);
+            const proxyAddress = await calculateProxyAddress(safeEIP7702ProxyFactory, await safeSingleton.getAddress(), setupData, 0);
             const isContract = (await ethers.provider.getCode(proxyAddress)) === "0x" ? false : true;
 
             if (!isContract) {
-                await safeERC7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), setupData, 0);
+                await safeEIP7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), setupData, 0);
             }
 
             const authorizationList = getAuthorizationList(chainId, authNonce, pkDelegator, proxyAddress);
