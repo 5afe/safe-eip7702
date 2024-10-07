@@ -47,12 +47,17 @@ sequenceDiagram
     actor Relayer as Relayer
     participant SafeEIP7702ProxyFactory as SafeEIP7702ProxyFactory
     participant EVM Node as EVM Node
-    EOA->>SafeEIP7702ProxyFactory: Calculate proxy address (staticcall to createProxyWithNonce)
+    opt Calulate proxy address
+    EOA->>SafeEIP7702ProxyFactory: staticcall to createProxyWithNonce
     SafeEIP7702ProxyFactory-->>EOA: Proxy address
+    end
+    par Set EOA account code
     EOA->>Relayer: Sign authorization transaction with chain_id, proxy address, and nonce
     Relayer->>EVM Node: Submit transaction (type 4)
     Note over Relayer,EVM Node: Set code for EOA as [0xef0100 + Safe Proxy address]
-    Relayer->>Safe Proxy factory: Deploy Safe Proxy (address of proxy depends on singleton and setup data)
+    and Deploy Proxy
+        Relayer->>Safe Proxy factory: Deploy Safe Proxy (address of proxy depends on singleton and setup data)
+    end
     Relayer->>EOA: Call setup function with initialization data
 ```
 
