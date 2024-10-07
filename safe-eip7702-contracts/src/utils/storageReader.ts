@@ -1,7 +1,7 @@
 import { AddressLike, Provider } from "ethers";
 import { FALLBACK_HANDLER_STORAGE_SLOT, GUARD_STORAGE_SLOT, readModuleStorageSlot, readOwnerStorageSlot, SENTINEL_ADDRESS } from "./safe";
 import { ethers } from "hardhat";
-import { ACCOUNT_CODE_PREFIX } from "../erc7702/helper";
+import { ACCOUNT_CODE_PREFIX } from "../eip7702/helper";
 import SafeL2 from "@safe-global/safe-contracts/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
 
 export const readStorage = async (provider: Provider, account: AddressLike) => {

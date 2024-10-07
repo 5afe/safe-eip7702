@@ -22,7 +22,7 @@ const deploy: DeployFunction = async ({ deployments, getNamedAccounts, network }
         deterministicDeployment: true,
     });
 
-    await deploy("SafeERC7702ProxyFactory", {
+    await deploy("SafeEIP7702ProxyFactory", {
         from: deployer,
         args: [],
         log: true,

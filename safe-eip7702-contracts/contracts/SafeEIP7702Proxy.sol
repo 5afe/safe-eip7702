@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 import {SafeProxy} from "@safe-global/safe-contracts/contracts/proxies/SafeProxy.sol";
 
-contract SafeERC7702Proxy is SafeProxy {
+contract SafeEIP7702Proxy is SafeProxy {
     bytes32 internal immutable SETUP_DATA_HASH;
     address internal immutable SINGLETON;
 
