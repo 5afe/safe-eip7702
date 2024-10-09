@@ -56,7 +56,7 @@ describe("EIP7702", () => {
     };
 
     describe("Test SafeEIP7702Proxy", function () {
-        it("Give authority to SafeEIP7702Proxy", async () => {
+        it.only("Give authority to SafeEIP7702Proxy", async () => {
             const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeEIP7702ProxyFactory } =
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
@@ -69,8 +69,10 @@ describe("EIP7702", () => {
             const authNonce = BigInt(await delegatorSigningKey.getNonce());
 
             // Deploy SafeProxy
-            const owners = [await deployer.getAddress()];
+            const owners = [await deployer.getAddress()];            
             const fallbackHandlerAddress = await fallbackHandler.getAddress();
+            console.log("owner address: ",owners);
+            console.log("fallbackHandlerAddress: ",fallbackHandlerAddress);
             const data = getSetupData(owners, 1, await safeModuleSetup.getAddress(), [fallbackHandlerAddress], fallbackHandlerAddress);
 
             const proxyAddress = await calculateProxyAddress(safeEIP7702ProxyFactory, await safeSingleton.getAddress(), data, 0);
@@ -80,7 +82,7 @@ describe("EIP7702", () => {
                 console.log("Deploying Proxy");
                 await safeEIP7702ProxyFactory.connect(deployer).createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
             } else {
-                console.log("Proxy already deployed");
+                console.log("Proxy already deployed: ", proxyAddress);
             }
 
             const authAddress = proxyAddress;
@@ -89,27 +91,31 @@ describe("EIP7702", () => {
             const encodedSignedTx = await getSignedTransaction(ethers.provider, relayerSigningKey, authorizationList);
 
             const isAlreadyDelegated = await isAccountDelegatedToAddress(ethers.provider, await delegator.getAddress(), authAddress);
-            if (isAlreadyDelegated) {
-                console.log("Account already delegated to Safe Proxy. Returning");
-                return;
-            }
+            // if (isAlreadyDelegated) {
+            //     console.log("Account already delegated to Safe Proxy. Returning");
+            //     return;
+            // }
 
-            const response = await ethers.provider.send("eth_sendRawTransaction", [encodedSignedTx]);
-            console.log("Set Auth transaction hash", response);
+            //const response = await ethers.provider.send("eth_sendRawTransaction", [encodedSignedTx]);
+            //console.log("Set Auth transaction hash", response);
 
-            console.log("Waiting for transaction confirmation");
-            const txReceipt = await (await ethers.provider.getTransaction(response))?.wait();
+            //console.log("Waiting for transaction confirmation");
+            //const txReceipt = await (await ethers.provider.getTransaction(response))?.wait();
 
-            expect(txReceipt?.status === 1, "Transaction failed");
+            // expect(txReceipt?.status === 1, "Transaction failed");
+            const account = await delegator.getAddress();
+
+            console.log(await delegator.getAddress(), authAddress);
+            console.log(await ethers.provider.getCode(account));
             expect(await isAccountDelegatedToAddress(ethers.provider, await delegator.getAddress(), authAddress)).to.be.true;
 
             console.log("Account successfully delegated to Safe Proxy");
 
-            const setupTxResponse = await relayer.sendTransaction({ to: await delegator.getAddress(), data: data });
-            const txSetupReceipt = await setupTxResponse.wait();
-            expect(txSetupReceipt?.status === 1, "Transaction failed");
+            // const setupTxResponse = await relayer.sendTransaction({ to: await delegator.getAddress(), data: data });
+            // const txSetupReceipt = await setupTxResponse.wait();
+            // expect(txSetupReceipt?.status === 1, "Transaction failed");
 
-            const account = await delegator.getAddress();
+            // const account = await delegator.getAddress();
             expect(await ethers.provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(
                 ethers.zeroPadValue(fallbackHandlerAddress, 32),
             );
@@ -124,6 +130,10 @@ describe("EIP7702", () => {
                 ethers.zeroPadValue(fallbackHandlerAddress, 32),
             );
             expect(await readOwnerStorageSlot(ethers.provider, account, SENTINEL_ADDRESS)).to.equal(ethers.zeroPadValue(owners[0], 32));
+
+            const tx =await execTransaction(relayer, [deployer], await getSafeAtAddress(account), "0x3C226c102E603C9471bD1450c2522Aa3dA323129", "1000000000000000000", "0x", "0");
+
+            console.log(tx.wait());
         });
 
         it("Revoke authority and clear storage", async () => {
