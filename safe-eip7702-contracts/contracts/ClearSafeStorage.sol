@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.27;
 
-import {SafeStorage} from "@safe-global/safe-contracts/contracts/libraries/SafeStorage.sol";
-import {ISafe} from "./interfaces/ISafe.sol";
+import {SafeStorage} from "@safe-global/safe-smart-account/contracts/libraries/SafeStorage.sol";
+import {ISafe} from "@safe-global/safe-smart-account/contracts/interfaces/ISafe.sol";
+import {Enum} from "@safe-global/safe-smart-account/contracts/libraries/Enum.sol";
 
 contract ClearSafeStorage is SafeStorage {
     address internal immutable SELF;
@@ -27,7 +28,7 @@ contract ClearSafeStorage is SafeStorage {
 
     function _clearStorage() internal {
         address safe = msg.sender;
-        ISafe(safe).execTransactionFromModule(address(this), 0, abi.encode(this.clearSafeStorageDelegateCallReciever.selector), 1);
+        ISafe(safe).execTransactionFromModule(address(this), 0, abi.encode(this.clearSafeStorageDelegateCallReciever.selector), Enum.Operation.DelegateCall);
     }
 
     function _removeAllOwners() internal {

@@ -3,11 +3,11 @@ pragma solidity ^0.8.27;
 
 import {IInteroperableDelegatedAccount} from "./interfaces/IInteroperableDelegatedAccount.sol";
 import {ClearSafeStorage} from "./ClearSafeStorage.sol";
-import {CompatibilityFallbackHandler} from "@safe-global/safe-contracts/contracts/handler/CompatibilityFallbackHandler.sol";
-import {HandlerContext} from "@safe-global/safe-contracts/contracts/handler/HandlerContext.sol";
-import {ISafe} from "./interfaces/ISafe.sol";
+import {CompatibilityFallbackHandler} from "@safe-global/safe-smart-account/contracts/handler/CompatibilityFallbackHandler.sol";
+import {ISafe} from "@safe-global/safe-smart-account/contracts/interfaces/ISafe.sol";
+import {Enum} from "@safe-global/safe-smart-account/contracts/libraries/Enum.sol";
 
-contract IDAFallbackHandler is CompatibilityFallbackHandler, IInteroperableDelegatedAccount, ClearSafeStorage, HandlerContext {
+contract IDAFallbackHandler is CompatibilityFallbackHandler, IInteroperableDelegatedAccount, ClearSafeStorage {
     error InvalidSender(address sender, address expected);
     event OnRedelegation();
 
@@ -28,7 +28,7 @@ contract IDAFallbackHandler is CompatibilityFallbackHandler, IInteroperableDeleg
             address(this),
             0,
             abi.encode(this.clearSafeStorageDelegateCallReciever.selector),
-            1
+            Enum.Operation.DelegateCall
         );
 
         if (!success) {

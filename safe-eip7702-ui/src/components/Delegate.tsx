@@ -7,6 +7,7 @@ import {
   encodeFunctionData,
   http,
   isAddress,
+  zeroAddress,
 } from "viem";
 import { config } from "../wagmi";
 import { WalletContext } from "../context/WalletContext";
@@ -19,6 +20,7 @@ import { waitForTransactionReceipt } from "wagmi/actions";
 import { eip7702Actions } from "viem/experimental";
 import { getProxyAddress } from "../utils/utils";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { relayAuthorization } from "../api/api";
 
 declare global {
   interface BigInt {
@@ -108,21 +110,9 @@ function Delegate() {
       return;
     }
 
-    const dataToSend = {
-      authorizationList: authorizations,
-      initData,
-    };
-
     setIsWaitingForTransactionHash(true);
-
-    const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    });
-
+    
+    const response = await relayAuthorization(authorizations, initData, account?.address || zeroAddress);
     if (!response.ok) console.error("Error setting account code", response);
 
     const result = await response.json();
