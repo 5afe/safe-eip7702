@@ -22,6 +22,7 @@ import { getProxyAddress } from "../utils/utils";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
+import DoneIcon from '@mui/icons-material/Done';
 
 declare global {
   interface BigInt {
@@ -50,6 +51,7 @@ function Delegate() {
   const [delegatee, setDelegatee] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
+  const [canSign, setCanSign] = useState<boolean>(false);
 
   const proxyFactory = safeEIP7702Addresses[chainId]?.addresses.proxyFactory;
 
@@ -105,6 +107,7 @@ function Delegate() {
     console.log("Calculating init data");
     const newInitData = calculateInitData() as `0x${string}`;
     setInitData(newInitData);
+
   }, [threshold, owners]);
 
   const handleConvertToSmartAccount = async () => {
@@ -156,6 +159,14 @@ function Delegate() {
       })();
     }
   }, [proxyAddress]);
+
+  useEffect(() => {
+    if(!proxyAddress || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)) {
+      setCanSign(true);
+    } else {
+      setCanSign(false);
+    }
+  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt]);
 
   const handleSignAuthorization = async (chainId: number) => {
     if (account && proxyAddress) {
@@ -225,7 +236,7 @@ function Delegate() {
                 </Link>
               }
             >
-              <Typography sx={{ color: "orange" }}>Account already delegated to address: {delegatee.slice(0, 6)}...{delegatee.slice(-4)}.</Typography>
+              <Typography sx={{ color: "orange" }}>Account already delegated to address: {"0x" + delegatee.slice(8, 14)}...{delegatee.slice(-4)}.</Typography>
             </Alert>
           ) : (
             <Typography align="center">Account not delegated</Typography>
@@ -323,15 +334,15 @@ function Delegate() {
             margin="normal"
           />
 
-          <Button variant="contained" disabled={!proxyAddress || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)} onClick={() => handleSignAuthorization(chainId)} sx={{ marginTop: 2 }} fullWidth>
-            Sign Authorization
+          <Button variant="contained" 
+            disabled={canSign}
+            onClick={() => handleSignAuthorization(chainId)}
+            sx={{ marginTop: 2 }}
+            fullWidth
+            endIcon={authorizations.length > 0 ? <DoneIcon />: null}
+          >
+            {authorizations.length === 0 ?  "Sign Authorization": "Already signed. Sign again"}
           </Button>
-
-          {signed ? (
-            <Box sx={{ marginTop: 2 }}>
-              <Typography variant="body1" align="center">Authorization Signed</Typography>
-            </Box>) : null
-          }
 
           <Button variant="contained" disabled={authorizations.length === 0 || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)} onClick={handleConvertToSmartAccount} sx={{ marginTop: 2 }} fullWidth>
               Convert to smart account {error ? "(Try again)" : null}

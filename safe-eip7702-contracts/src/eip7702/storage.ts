@@ -14,7 +14,7 @@ export const isAccountDelegatedToAddress = async (provider: Provider, account: A
     );
 };
 
-export const getDelegatedToAddress = async (provider: Provider, account: AddressLike, authority: string): Promise<string> => {
+export const getDelegatedToAddress = async (provider: Provider, account: AddressLike): Promise<string> => {
     const codeAtEOA = await provider.getCode(account);
     return "0x" + codeAtEOA.slice(8);
 };
