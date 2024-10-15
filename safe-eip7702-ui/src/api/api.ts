@@ -1,38 +1,49 @@
+import { Address } from "viem";
 import { AuthorizationList } from "viem/experimental";
 
-export const relayAuthorization = async (authorizationList: AuthorizationList, initData: string | undefined, from: string): Promise<Response> => {
+export const relayAuthorization = async (
+  authorizationList: AuthorizationList,
+  initData: string | undefined,
+  proxyFactory: Address,
+  from: string
+): Promise<any> => {
+  try {
     const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            authorizationList,
-            initData,
-            from
-        }),
-      });
-
-      
-    return response;
-}
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      authorizationList,
+      initData,
+      from,
+      proxyFactory
+    }),
+  });
+  return await response.json()
+  } catch (error) {
+    console.error("Failed to relay authorization:", error);
+    return {
+      error: error
+    };
+  }
+};
 
 export const checkRPCStatus = async (rpcUrl: string): Promise<boolean> => {
-  
   const data = {
-    "jsonrpc": "2.0",
-    "id": "1",
-    "method": "eth_chainId",
-    "params": null
-  }
+    jsonrpc: "2.0",
+    id: "1",
+    method: "web3_clientVersion",
+    params: null,
+  };
 
   try {
     const response = await fetch(rpcUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -52,4 +63,4 @@ export const checkRPCStatus = async (rpcUrl: string): Promise<boolean> => {
     console.error("Failed to connect to the Ethereum RPC:", error);
     return false;
   }
-}
+};

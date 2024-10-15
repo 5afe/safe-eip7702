@@ -14,7 +14,7 @@ import { WalletContext } from "../context/WalletContext";
 import { safeEIP7702Addresses } from "../safe-eip7702-config/address";
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
 import safeModuleSetup from "../safe-eip7702-config/artifact/SafeModuleSetup.json";
-import { Button, Typography, TextField, Box, List, ListItem, IconButton, Alert, AlertTitle } from "@mui/material";
+import { Button, Typography, TextField, Box, IconButton, Alert, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { eip7702Actions } from "viem/experimental";
@@ -48,6 +48,8 @@ function Delegate() {
   const [signed, setSigned] = useState<boolean>(false);
   const [isProxyDeployed, setIsProxyDeployed] = useState<boolean>(false);
   const [delegatee, setDelegatee] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
 
   const proxyFactory = safeEIP7702Addresses[chainId]?.addresses.proxyFactory;
 
@@ -106,17 +108,17 @@ function Delegate() {
   }, [threshold, owners]);
 
   const handleConvertToSmartAccount = async () => {
+    setError(undefined);
     if (!authorizations.length) {
       setErrorMessage("Authorization not signed");
       return;
     }
 
+    setLoading(true);
     setIsWaitingForTransactionHash(true);
-    
-    const response = await relayAuthorization(authorizations, initData, account?.address || zeroAddress);
-    if (!response.ok) console.error("Error setting account code", response);
 
-    const result = await response.json();
+    const result = await relayAuthorization(authorizations, initData, proxyFactory, account?.address || zeroAddress);
+
     setIsWaitingForTransactionHash(false);
 
     if (result.txHash) {
@@ -126,7 +128,11 @@ function Delegate() {
         hash: result.txHash,
       });
       setIsWaitingForTransactionReceipt(false);
+    } else {
+      setError("Failed to relay authorization");
+      console.error("Request to relay authorization failed:", result.error);
     }
+    setLoading(false);
   };
 
   const walletClient = createWalletClient({
@@ -204,7 +210,7 @@ function Delegate() {
   });
 
   return (
-    <Box sx={{ padding: 2}}>
+    <Box sx={{ padding: 2 }}>
       <Grid container justifyContent="center">
         <Grid>
           <Typography variant="h4" align="center">
@@ -213,14 +219,14 @@ function Delegate() {
 
           {delegatee ? (
             <Alert severity="warning" variant="standard" sx={{ bgcolor: 'background.paper' }}
-            action={
-              <Link to={"/settings"}>
-                View storage
-              </Link>
-            }
+              action={
+                <Link to={"/settings"}>
+                  View storage
+                </Link>
+              }
             >
-              <Typography sx={{color: "orange"}}>Account already delegated to address: {delegatee.slice(0, 6)}...{delegatee.slice(-4)}.</Typography>
-             </Alert>
+              <Typography sx={{ color: "orange" }}>Account already delegated to address: {delegatee.slice(0, 6)}...{delegatee.slice(-4)}.</Typography>
+            </Alert>
           ) : (
             <Typography align="center">Account not delegated</Typography>
           )}
@@ -275,8 +281,8 @@ function Delegate() {
                 />
               </Grid>
               <Grid size={2}>
-                <IconButton sx={{color:"grey"}} onClick={() => removeOwner(index)}>
-                  <DeleteOutlineIcon/>
+                <IconButton sx={{ color: "grey" }} onClick={() => removeOwner(index)}>
+                  <DeleteOutlineIcon />
                 </IconButton>
                 {/* <Button variant="contained" color="error" onClick={() => removeOwner(index)}>
                   Remove
@@ -292,11 +298,6 @@ function Delegate() {
           {/* <Typography sx={{ wordBreak: "break-word", marginTop: 2 }}>{initData}</Typography> */}
 
           {errorMessage && <Typography color="error">{errorMessage}</Typography>}
-
-          <Typography variant="h6" sx={{ marginTop: 2 }} align="center">
-            Authorization Input
-          </Typography>
-
 
           {proxyAddress ? (
             <div>
@@ -322,21 +323,19 @@ function Delegate() {
             margin="normal"
           />
 
-          <Button variant="contained" disabled={!proxyAddress} onClick={() => handleSignAuthorization(chainId)} sx={{ marginTop: 2 }} fullWidth>
+          <Button variant="contained" disabled={!proxyAddress || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)} onClick={() => handleSignAuthorization(chainId)} sx={{ marginTop: 2 }} fullWidth>
             Sign Authorization
           </Button>
 
           {signed ? (
             <Box sx={{ marginTop: 2 }}>
               <Typography variant="body1" align="center">Authorization Signed</Typography>
-            </Box>): null
-           }
-
-          { !signed && proxyAddress?
-          <Typography variant="body1" align="center" sx={{ marginTop: 2 }}>
-              Authorization not signed
-            </Typography>: null
+            </Box>) : null
           }
+
+          <Button variant="contained" disabled={authorizations.length === 0 || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)} onClick={handleConvertToSmartAccount} sx={{ marginTop: 2 }} fullWidth>
+              Convert to smart account {error ? "(Try again)" : null}
+          </Button>
 
           {transactionHash && (
             <Typography align="center">Transaction hash: {transactionHash}</Typography>
@@ -344,11 +343,14 @@ function Delegate() {
 
           {(isWaitingForTransactionHash || isWaitingForTransactionReceipt) ? (
             <Typography align="center">Waiting for transaction to confirm</Typography>
-          ) : (
-            <Button variant="contained" disabled={authorizations.length === 0} onClick={handleConvertToSmartAccount} sx={{ marginTop: 2 }} fullWidth>
-              Convert to smart account
-            </Button>
-          )}
+          ) : null}
+
+          {
+            loading && <CircularProgress />
+          }
+          {error && <Alert severity="error" sx={{ bgcolor: 'background.paper' }}>
+            <Typography sx={{ color: "red" }}>{error}</Typography>
+          </Alert>}
         </Grid>
       </Grid>
     </Box>
