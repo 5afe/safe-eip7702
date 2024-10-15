@@ -1,5 +1,7 @@
-import { encodePacked, keccak256, getContractAddress } from 'viem'
+import { encodePacked, keccak256, getContractAddress, PublicClient, Address } from 'viem'
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
+
+export const ACCOUNT_CODE_PREFIX = "0xef0100";
 
 export const getProxyAddress = (
     factory: `0x${string}`,
@@ -46,3 +48,39 @@ export const getMultiSendCallData = (transactions: MultiSendTransactions): `0x${
     return packedTransactions as `0x${string}`;
    
 }
+
+
+// Function to check if the account is delegated
+export const isAccountDelegated = async (client: PublicClient, account: Address): Promise<boolean> => {
+    const codeAtEOA = await client.getCode({ address: account });
+    return codeAtEOA?.length === 48 && codeAtEOA.startsWith(ACCOUNT_CODE_PREFIX);
+};
+
+// Function to check if the account is delegated to a specific address
+export const isAccountDelegatedToAddress = async (
+    client: PublicClient, 
+    account: Address, 
+    authority: Address
+): Promise<boolean> => {
+    const codeAtEOA = await client.getCode({ address: account });
+
+    return (
+        codeAtEOA?.length === 48 &&
+        codeAtEOA.startsWith(ACCOUNT_CODE_PREFIX) &&
+        `0x${codeAtEOA.slice(8)}`.toLowerCase() === authority.toLowerCase()
+    );
+};
+
+// Function to get the address the account is delegated to
+export const getDelegatedToAddress = async (
+    client: PublicClient, 
+    account: Address
+): Promise<Address> => {
+    const codeAtEOA = await client.getCode({ address: account });
+
+    if (!codeAtEOA || codeAtEOA.length < 48) {
+        throw new Error('Invalid code length');
+    }
+    
+    return `0x${codeAtEOA.slice(8)}` as Address;
+};

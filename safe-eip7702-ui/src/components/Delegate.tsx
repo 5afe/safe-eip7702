@@ -14,13 +14,14 @@ import { WalletContext } from "../context/WalletContext";
 import { safeEIP7702Addresses } from "../safe-eip7702-config/address";
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
 import safeModuleSetup from "../safe-eip7702-config/artifact/SafeModuleSetup.json";
-import { Button, Typography, TextField, Box, List, ListItem, IconButton } from "@mui/material";
+import { Button, Typography, TextField, Box, List, ListItem, IconButton, Alert, AlertTitle } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { eip7702Actions } from "viem/experimental";
 import { getProxyAddress } from "../utils/utils";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { relayAuthorization } from "../api/api";
+import { Link } from "react-router-dom";
 
 declare global {
   interface BigInt {
@@ -211,7 +212,15 @@ function Delegate() {
           </Typography>
 
           {delegatee ? (
-            <Typography align="center" variant="h6">Account already delegated to address: {"0x" + delegatee.slice(8)}</Typography>
+            <Alert severity="warning" variant="standard" sx={{ bgcolor: 'background.paper' }}
+            action={
+              <Link to={"/settings"}>
+                View storage
+              </Link>
+            }
+            >
+              <Typography sx={{color: "orange"}}>Account already delegated to address: {delegatee.slice(0, 6)}...{delegatee.slice(-4)}.</Typography>
+             </Alert>
           ) : (
             <Typography align="center">Account not delegated</Typography>
           )}

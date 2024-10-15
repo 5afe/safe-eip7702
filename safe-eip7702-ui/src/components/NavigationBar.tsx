@@ -53,17 +53,6 @@ const NavigationBar: React.FC = () => {
 
           <Button
             component={Link}
-            to="/batch"
-            disabled={!isPrivateKeyValid}
-            sx={{
-              marginRight: 2,
-            }}
-          >
-            Batch
-          </Button>
-
-          <Button
-            component={Link}
             to="/settings"
             disabled={!isPrivateKeyValid}
             sx={{
