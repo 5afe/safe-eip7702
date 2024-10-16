@@ -54,7 +54,6 @@ const retroTheme = createTheme({
         root: {
           color: retroGreen, // Green text in input fields
           backgroundColor: '#000', // Black input background for retro feel
-          border: `2px solid ${retroGreen}`, // Green border for input fields
         },
       },
     },

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { CircularProgress, Typography } from '@mui/material';
+import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { WalletContext } from '../context/WalletContext';
 import { readStorage, SafeStorage, SENTINEL_ADDRESS } from '../utils/storageReader';
@@ -17,6 +17,7 @@ const Settings: React.FC = () => {
   const [owners, setOwners] = React.useState<string[]>();
   const [modules, setModules] = React.useState<string[]>();
   const [isDelegated, setIsDelegated] = React.useState<boolean>(false);
+  const [isDelegatedToSafeSingleton, setIsDelegatedToSafeSingleton] = React.useState<boolean>(false);
 
 
   const publicClient = createPublicClient({
@@ -35,6 +36,8 @@ const Settings: React.FC = () => {
       }
 
       if (isAddressEqual(storage.singleton, safeEIP7702Addresses[chainId].addresses.safeSingleton)) {
+
+        setIsDelegatedToSafeSingleton(true);
 
         const contract = getContract({
           address: account.address,
@@ -62,27 +65,36 @@ const Settings: React.FC = () => {
 
 
   return (
-    <div style={{ color: '#00ff00', textAlign: 'center', marginTop: '20px' }}>
-      <Typography variant="h4">Account storage</Typography>
+    <Box sx={{ padding: 2 }}>
+      <Grid container justifyItems="center" size={12}>
+        <Grid size={12}>
+          <Typography variant="h4">Account storage</Typography>
+        </Grid>
 
-      {loading ? <CircularProgress /> : (<Grid container spacing={2}>
-        <Grid size={12}>Singleton: {safeStorage?.singleton}</Grid>
-        <Grid size={12}>Fallbackhandler: {safeStorage?.fallbackHandler}</Grid>
-        <Grid size={12}>Threshold: {safeStorage?.threshold.toString()}</Grid>
-        <Grid size={12}>Nonce: {safeStorage?.nonce.toString()}</Grid>
-        <Grid size={12}>Owner Count: {safeStorage?.ownerCount.toString()}</Grid>
-        <Grid size={12}>Delegatee: {isDelegated && accountCode ? "0x" + accountCode.slice(8,) : ""}</Grid>
-        <Grid size={12}>
-          Owners: {owners?.map(owner => <Grid key={owner}>{owner}</Grid>)}
+        {loading ? <Grid size={12}><CircularProgress /> </Grid>: (<Grid container spacing={2}>
+          {
+            isDelegatedToSafeSingleton && <Alert severity="success" sx={{ bgcolor: 'background.paper' }}>
+              <Typography color="primary">This account is delegated to Safe Singleton</Typography>
+            </Alert>
+          }
+          <Grid size={12}>Singleton: {safeStorage?.singleton}</Grid>
+          <Grid size={12}>Fallbackhandler: {safeStorage?.fallbackHandler}</Grid>
+          <Grid size={12}>Threshold: {safeStorage?.threshold.toString()}</Grid>
+          <Grid size={12}>Nonce: {safeStorage?.nonce.toString()}</Grid>
+          <Grid size={12}>Owner Count: {safeStorage?.ownerCount.toString()}</Grid>
+          <Grid size={12}>Delegatee: {isDelegated && accountCode ? "0x" + accountCode.slice(8,) : ""}</Grid>
+          <Grid size={12}>
+            Owners: {owners?.map(owner => <Grid key={owner}>{owner}</Grid>)}
+          </Grid>
+          <Grid size={12}>
+            Modules: {modules?.map(module => <Grid key={module}>{module}</Grid>)}
+          </Grid>
         </Grid>
-        <Grid size={12}>
-          Modules: {modules?.map(module => <Grid key={module}>{module}</Grid>)}
-        </Grid>
+
+        )}
+
       </Grid>
-
-      )}
-
-    </div>
+    </Box>
   );
 };
 

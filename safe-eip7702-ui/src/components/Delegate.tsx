@@ -7,6 +7,7 @@ import {
   encodeFunctionData,
   http,
   isAddress,
+  isAddressEqual,
   zeroAddress,
 } from "viem";
 import { config } from "../wagmi";
@@ -55,6 +56,79 @@ function Delegate() {
 
   const proxyFactory = safeEIP7702Addresses[chainId]?.addresses.proxyFactory;
 
+  useEffect(() => {
+    const newInitData = calculateInitData() as `0x${string}`;
+    console.log("Calculating init data. Is new data defined? ", newInitData === undefined);
+    setInitData(newInitData);
+  }, [threshold, owners]);
+
+  useEffect(() => {
+    if (!proxyAddress || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)) {
+      setCanSign(true);
+    } else {
+      setCanSign(false);
+    }
+  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt]);
+
+  useEffect(() => {
+    if (proxyAddress) {
+      (async () => {
+        console.log("checking proxy code");
+        const proxyCode = await publicClient.getCode({ address: proxyAddress });
+        if (proxyCode) {
+          setIsProxyDeployed(true);
+        } else {
+          setIsProxyDeployed(false);
+        }
+      })();
+    }
+  }, [proxyAddress]);
+
+  useEffect(() => {
+    if (proxyFactory && chainId && nonce !== undefined) calculateProxyAddress();
+  }, [proxyFactory, chainId, initData]);
+
+  useEffect(() => {
+    if (account) {
+      (async () => {
+        const publicClient = createPublicClient({
+          transport: http(safeEIP7702Addresses[chainId].rpc),
+        });
+
+        const transactionCount = await publicClient.getTransactionCount({
+          address: account.address,
+        });
+        setNonce(transactionCount);
+
+        setDelegatee(await publicClient.getCode({ address: account.address }));
+      })();
+    }
+  });
+
+  const validateOwners = (): boolean => {
+    const uniqueOwners = new Set(owners);
+    return uniqueOwners.size === owners.length && owners.every((owner) => isAddress(owner));
+  };
+
+  const handleThresholdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    if (!isNaN(value) && value > 0) setThreshold(value);
+    else alert("Threshold must be a positive number.");
+  };
+
+  const handleOwnerChange = (index: number, value: string) => {
+    const updatedOwners = [...owners];
+    updatedOwners[index] = value;
+    setOwners(updatedOwners);
+  };
+
+  const addOwner = () => setOwners([...owners, ""]);
+
+  const removeOwner = (index: number) => {
+    const updatedOwners = owners.filter((_, i) => i !== index);
+    setOwners(updatedOwners);
+  };
+
   const calculateInitData = () => {
     if (!chainId || owners.length === 0 || !validateOwners() || threshold > owners.length) return;
 
@@ -81,34 +155,6 @@ function Delegate() {
 
     return setupCalldata;
   };
-
-  const validateOwners = () => owners.every((owner) => isAddress(owner));
-
-  const handleThresholdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-    if (!isNaN(value) && value > 0) setThreshold(value);
-    else alert("Threshold must be a positive number.");
-  };
-
-  const handleOwnerChange = (index: number, value: string) => {
-    const updatedOwners = [...owners];
-    updatedOwners[index] = value;
-    setOwners(updatedOwners);
-  };
-
-  const addOwner = () => setOwners([...owners, ""]);
-
-  const removeOwner = (index: number) => {
-    const updatedOwners = owners.filter((_, i) => i !== index);
-    setOwners(updatedOwners);
-  };
-
-  useEffect(() => {
-    console.log("Calculating init data");
-    const newInitData = calculateInitData() as `0x${string}`;
-    setInitData(newInitData);
-
-  }, [threshold, owners]);
 
   const handleConvertToSmartAccount = async () => {
     setError(undefined);
@@ -146,28 +192,6 @@ function Delegate() {
     transport: http(safeEIP7702Addresses[chainId].rpc),
   });
 
-  useEffect(() => {
-    if (proxyAddress) {
-      (async () => {
-        console.log("checking proxy code");
-        const proxyCode = await publicClient.getCode({ address: proxyAddress });
-        if (proxyCode) {
-          setIsProxyDeployed(true);
-        } else {
-          setIsProxyDeployed(false);
-        }
-      })();
-    }
-  }, [proxyAddress]);
-
-  useEffect(() => {
-    if(!proxyAddress || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)) {
-      setCanSign(true);
-    } else {
-      setCanSign(false);
-    }
-  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt]);
-
   const handleSignAuthorization = async (chainId: number) => {
     if (account && proxyAddress) {
       const authorization = await walletClient.signAuthorization({
@@ -183,7 +207,12 @@ function Delegate() {
   };
 
   const calculateProxyAddress = async () => {
-    if (!proxyFactory || !chainId || !initData) return;
+    if (!proxyFactory || !chainId || !initData) {
+      setProxyAddress(undefined);
+      setSigned(false);
+      setAuthorizations([]);
+      return;
+    };
 
     const calculatedProxyAddress = getProxyAddress(
       safeEIP7702Addresses[chainId].addresses.proxyFactory,
@@ -199,26 +228,6 @@ function Delegate() {
     }
   };
 
-  useEffect(() => {
-    if (proxyFactory && chainId && nonce !== undefined) calculateProxyAddress();
-  }, [proxyFactory, chainId, initData]);
-
-  useEffect(() => {
-    if (account) {
-      (async () => {
-        const publicClient = createPublicClient({
-          transport: http(safeEIP7702Addresses[chainId].rpc),
-        });
-
-        const transactionCount = await publicClient.getTransactionCount({
-          address: account.address,
-        });
-        setNonce(transactionCount);
-
-        setDelegatee(await publicClient.getCode({ address: account.address }));
-      })();
-    }
-  });
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -289,6 +298,8 @@ function Delegate() {
                   onChange={(e) => handleOwnerChange(index, e.target.value)}
                   placeholder="Enter owner address"
                   margin="normal"
+                  error={!isAddress(owner)}
+                  helperText={(!isAddress(owner) && "Invalid address") || account?.address && isAddressEqual(owner as `0x${string}`, account?.address) && "EOA address"}
                 />
               </Grid>
               <Grid size={2}>
@@ -334,18 +345,18 @@ function Delegate() {
             margin="normal"
           />
 
-          <Button variant="contained" 
+          <Button variant="contained"
             disabled={canSign}
             onClick={() => handleSignAuthorization(chainId)}
             sx={{ marginTop: 2 }}
             fullWidth
-            endIcon={authorizations.length > 0 ? <DoneIcon />: null}
+            endIcon={authorizations.length > 0 ? <DoneIcon /> : null}
           >
-            {authorizations.length === 0 ?  "Sign Authorization": "Already signed. Sign again"}
+            {authorizations.length === 0 ? "Sign Authorization" : "Already signed. Sign again"}
           </Button>
 
           <Button variant="contained" disabled={authorizations.length === 0 || (isWaitingForTransactionHash || isWaitingForTransactionReceipt)} onClick={handleConvertToSmartAccount} sx={{ marginTop: 2 }} fullWidth>
-              Convert to smart account {error ? "(Try again)" : null}
+            Convert to smart account {error ? "(Try again)" : null}
           </Button>
 
           {transactionHash && (
