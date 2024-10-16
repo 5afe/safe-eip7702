@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
+import { Container, CssBaseline } from '@mui/material';
 import retroTheme from './theme';
 import Delegate from './components/Delegate';
 import Settings from './components/Settings';
@@ -15,12 +15,12 @@ const App: React.FC = () => {
         <CssBaseline />
         <Router>
           <NavigationBar />
-          <div style={{ padding: 20 }}>
+          <Container maxWidth="md">
             <Routes>
               <Route path="/delegate" element={<Delegate />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
-          </div>
+          </Container>
         </Router>
       </ThemeProvider>
     </WalletProvider>

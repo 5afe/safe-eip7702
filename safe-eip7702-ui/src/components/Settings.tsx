@@ -65,15 +65,14 @@ const Settings: React.FC = () => {
 
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Grid container justifyItems="center" size={12}>
-        <Grid size={12}>
+      <Grid container size={3}  id="settings-gird-container">
+        <Grid>
           <Typography variant="h4">Account storage</Typography>
         </Grid>
 
         {loading ? <Grid size={12}><CircularProgress /> </Grid>: (<Grid container spacing={2}>
           {
-            isDelegatedToSafeSingleton && <Alert severity="success" sx={{ bgcolor: 'background.paper' }}>
+            isDelegatedToSafeSingleton && <Alert severity="success">
               <Typography color="primary">This account is delegated to Safe Singleton</Typography>
             </Alert>
           }
@@ -94,7 +93,6 @@ const Settings: React.FC = () => {
         )}
 
       </Grid>
-    </Box>
   );
 };
 

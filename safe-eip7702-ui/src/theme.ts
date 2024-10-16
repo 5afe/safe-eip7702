@@ -57,6 +57,13 @@ const retroTheme = createTheme({
         },
       },
     },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#222222', // Black input background for retro feel
+        },
+      },
+    }
   },
 });
 
