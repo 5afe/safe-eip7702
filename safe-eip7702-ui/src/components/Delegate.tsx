@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Abi,
   PrivateKeyAccount,
@@ -19,13 +19,13 @@ import {
   Button,
   Typography,
   TextField,
-  Box,
   IconButton,
   Alert,
   CircularProgress,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Box,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { waitForTransactionReceipt } from "wagmi/actions";
@@ -35,6 +35,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
+import AddIcon from '@mui/icons-material/Add';
 
 declare global {
   interface BigInt {
@@ -240,154 +241,194 @@ function Delegate() {
   };
 
   return (
-    <Grid container justifyContent="center">
-      <Grid>
-        <Typography variant="h4" align="center">
-          EIP-7702 Delegate Setup
-        </Typography>
+    <Box>
+      <Typography variant="h3" align="left">
+        EIP-7702 Delegate Setup
+      </Typography>
 
-        {delegatee ? (
-          <Alert
-            severity="warning"
-            variant="standard"
-            sx={{ bgcolor: "background.paper" }}
-            action={<Link to={"/settings"}>View storage</Link>}
-          >
-            <Typography sx={{ color: "orange" }}>
-              Account already delegated to address: {"0x" + delegatee.slice(8, 14)}...{delegatee.slice(-4)}.
-            </Typography>
-          </Alert>
-        ) : (
-          <Typography align="center">Account not delegated</Typography>
-        )}
+      {delegatee ? (
+        <Alert
+          severity="warning"
+          variant="standard"
+          sx={{ bgcolor: "background.paper" }}
+          action={<Link to={"/settings"}>View storage</Link>}
+        >
+          <Typography sx={{ color: "orange" }}>
+            Account already delegated to address: {getShortAddress("0x" + delegatee.slice(8) as `0x${string}`)}.
+          </Typography>
+        </Alert>
+      ) : (
+        <Typography align="center">Account not delegated</Typography>
+      )}
 
-        <Typography variant="h5" sx={{ marginTop: 2 }} align="center">
-          Safe Config
-        </Typography>
+      <Typography variant="h4" sx={{ marginTop: 2 }}>
+        Safe Config
+      </Typography>
 
-        <Typography>Proxy Factory: {proxyFactory}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Proxy Factory</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{proxyFactory}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography>Safe Singleton: {safeEIP7702Addresses[chainId]?.addresses.safeSingleton}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Safe Singleton</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.safeSingleton}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography>Fallback Handler: {safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Fallback Handler</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography>Module Setup: {safeEIP7702Addresses[chainId]?.addresses.moduleSetup}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Module Setup</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.moduleSetup}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography>Module: {safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Module</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography color="primary">ChainID: {chainId}</Typography>
+      <Grid container >
+        <Grid size={4}>
+          <Typography>ChainID</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{chainId}</Typography>
+        </Grid>
+      </Grid>
 
-        <Typography variant="h6" sx={{ marginTop: 2 }}>
-          Owners
-        </Typography>
+      <Typography variant="h4" sx={{ marginTop: 2 }}>
+        Owners
+      </Typography>
 
+      <Grid container size={12}>
         {owners.map((owner, index) => (
-          <Grid container key={index} spacing={2} alignItems="center">
+          <Grid size={12} container key={index} spacing={2} alignItems="center">
             <Grid size={10}>
               <TextField
                 fullWidth
+                label={`Signer ${index + 1} ${(account?.address && isAddress(owner) && isAddressEqual(owner as `0x${string}`, account?.address)) ? "(Connected EOA address)" : ""}`}
                 value={owner}
                 onChange={(e) => handleOwnerChange(index, e.target.value)}
-                placeholder="Enter owner address"
+                placeholder="Enter singer address"
                 margin="normal"
                 error={!isAddress(owner) || owners.indexOf(owner) !== owners.lastIndexOf(owner)}
                 helperText={
                   (!isAddress(owner) && "Invalid address") ||
-                  (owners.indexOf(owner) !== owners.lastIndexOf(owner) && "Duplicate owner address") ||
-                  (account?.address && isAddressEqual(owner as `0x${string}`, account?.address) && "Connected EOA address")
+                  (owners.indexOf(owner) !== owners.lastIndexOf(owner) && "Duplicate singer address")
+
                 }
               />
             </Grid>
             <Grid size={2}>
-              <IconButton sx={{ color: "grey" }} onClick={() => removeOwner(index)}>
+              <IconButton sx={{ color: "grey" }} size="large" onClick={() => removeOwner(index)}>
                 <DeleteOutlineIcon />
               </IconButton>
             </Grid>
           </Grid>
         ))}
-
-        <Button variant="contained" onClick={addOwner}>
-          Add Owner
-        </Button>
-
-        <Grid container>
-          <Grid sx={{ marginRight: "10pt" }}>
-            <Typography variant="h6" sx={{ marginTop: 2 }}>
-              Threshold
-            </Typography>
-          </Grid>
-          <Grid>
-            <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: '1px solid #ced4da' }}>
-              {owners.map((owner, index) => (
-                <MenuItem key={owner} value={index + 1}>{index + 1}</MenuItem>
-              ))}
-            </Select>
-          </Grid>
-        </Grid>
-
-        {errorMessage && <Typography color="error">{errorMessage}</Typography>}
-
-        {proxyAddress ? (
-          <div>
-
-            {isProxyDeployed ? (
-              <Alert>
-                <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
-              </Alert>
-            ) : (
-              <Alert severity="info">
-                <Typography color="primary">
-                  Proxy  {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
-                </Typography>
-              </Alert>
-            )}
-          </div>
-        ) : null}
-
-        <TextField
-          label="Nonce"
-          type="number"
-          value={nonce}
-          onChange={(e) => setNonce(parseInt(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
-
-        <Button
-          variant="contained"
-          disabled={canSign || authorizations.length > 0}
-          onClick={() => handleSignAuthorization(chainId)}
-          sx={{ marginTop: 2 }}
-          fullWidth
-          endIcon={authorizations.length > 0 ? <DoneIcon /> : null}
-        >
-          {authorizations.length === 0 ? "Sign Authorization" : "Authorization Signed"}
-        </Button>
-
-        <Button
-          variant="contained"
-          disabled={authorizations.length === 0 || isWaitingForTransactionHash || isWaitingForTransactionReceipt}
-          onClick={handleConvertToSmartAccount}
-          sx={{ marginTop: 2 }}
-          fullWidth
-        >
-          Convert to smart account {error ? "(Try again)" : null}
-        </Button>
-
-        {transactionHash && <Typography align="center">Transaction hash: {transactionHash}</Typography>}
-
-        {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
-          <Typography align="center">Waiting for transaction to confirm</Typography>
-        ) : null}
-
-        {loading && <CircularProgress />}
-        {error && (
-          <Alert severity="error" sx={{ bgcolor: "background.paper" }}>
-            <Typography sx={{ color: "red" }}>{error}</Typography>
-          </Alert>
-        )}
       </Grid>
-    </Grid>
+
+      <Button variant="outlined" startIcon={<AddIcon />} onClick={addOwner}>
+        Add Signer
+      </Button>
+
+      <Typography variant="h4">Threshold</Typography>
+
+      <Grid container>
+        <Grid>
+          <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: '1px solid #ced4da' }}>
+            {owners.map((owner, index) => (
+              <MenuItem key={owner} value={index + 1}>{index + 1}</MenuItem>
+            ))}
+          </Select>
+        </Grid>
+      </Grid>
+
+      {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+
+      {proxyAddress ? (
+        <div>
+
+          {isProxyDeployed ? (
+            <Alert>
+              <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
+            </Alert>
+          ) : (
+            <Alert severity="info">
+              <Typography color="primary">
+                Proxy  {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
+              </Typography>
+            </Alert>
+          )}
+        </div>
+      ) : null}
+
+      <TextField
+        label="Nonce"
+        type="number"
+        value={nonce}
+        onChange={(e) => setNonce(parseInt(e.target.value))}
+        fullWidth
+        margin="normal"
+      />
+
+      <Button
+        variant="contained"
+        disabled={canSign || authorizations.length > 0}
+        onClick={() => handleSignAuthorization(chainId)}
+        sx={{ marginTop: 2 }}
+        fullWidth
+        endIcon={authorizations.length > 0 ? <DoneIcon /> : null}
+      >
+        {authorizations.length === 0 ? "Sign Authorization" : "Authorization Signed"}
+      </Button>
+
+      <Button
+        variant="contained"
+        disabled={authorizations.length === 0 || isWaitingForTransactionHash || isWaitingForTransactionReceipt}
+        onClick={handleConvertToSmartAccount}
+        sx={{ marginTop: 2 }}
+        fullWidth
+      >
+        Convert to smart account {error ? "(Try again)" : null}
+      </Button>
+
+      {transactionHash && <Typography align="center">Transaction hash: {transactionHash}</Typography>}
+
+      {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
+        <Typography align="center">Waiting for transaction to confirm</Typography>
+      ) : null}
+
+      {loading && <CircularProgress />}
+      {error && (
+        <Alert severity="error" sx={{ bgcolor: "background.paper" }}>
+          <Typography sx={{ color: "red" }}>{error}</Typography>
+        </Alert>
+      )}
+    </Box>
   );
 }
 
