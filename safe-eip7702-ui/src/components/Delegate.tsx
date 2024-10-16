@@ -58,6 +58,7 @@ function Delegate() {
   const [isWaitingForTransactionHash, setIsWaitingForTransactionHash] = useState<boolean>(false);
   const [isWaitingForTransactionReceipt, setIsWaitingForTransactionReceipt] = useState<boolean>(false);
   const [transactionHash, setTransactionHash] = useState<`0x${string}`>();
+  const [proxyCreationSalt, setProxyCreationSalt] = useState<bigint>(0n);
   const [nonce, setNonce] = useState<number>(0);
   const [signed, setSigned] = useState<boolean>(false);
   const [isProxyDeployed, setIsProxyDeployed] = useState<boolean>(false);
@@ -230,7 +231,7 @@ function Delegate() {
       safeEIP7702Addresses[chainId].addresses.proxyFactory,
       safeEIP7702Addresses[chainId].addresses.safeSingleton,
       initData,
-      0n
+      proxyCreationSalt
     );
 
     setProxyAddress(calculatedProxyAddress);
@@ -246,23 +247,8 @@ function Delegate() {
         EIP-7702 Delegate Setup
       </Typography>
 
-      {delegatee ? (
-        <Alert
-          severity="warning"
-          variant="standard"
-          sx={{ bgcolor: "background.paper" }}
-          action={<Link to={"/settings"}>View storage</Link>}
-        >
-          <Typography sx={{ color: "orange" }}>
-            Account already delegated to address: {getShortAddress("0x" + delegatee.slice(8) as `0x${string}`)}.
-          </Typography>
-        </Alert>
-      ) : (
-        <Typography align="center">Account not delegated</Typography>
-      )}
-
       <Typography variant="h4" sx={{ marginTop: 2 }}>
-        Safe Config
+        Delegation Config
       </Typography>
 
       <Grid container >
@@ -319,6 +305,34 @@ function Delegate() {
         </Grid>
       </Grid>
 
+      <Grid container >
+        <Grid size={4}>
+          <Typography>Proxy Creation salt</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{proxyCreationSalt.toString()}</Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container >
+        <Grid size={4}>
+          <Typography>EOA nonce</Typography>
+        </Grid>
+        <Grid size={8}>
+          <Typography align="left">{nonce}</Typography>
+        </Grid>
+      </Grid>
+
+
+      {/* <TextField
+        label="Nonce"
+        type="number"
+        value={nonce}
+        onChange={(e) => setNonce(parseInt(e.target.value))}
+        fullWidth
+        margin="normal"
+      /> */}
+
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         Owners
       </Typography>
@@ -355,7 +369,7 @@ function Delegate() {
         Add Signer
       </Button>
 
-      <Typography variant="h4">Threshold</Typography>
+      <Typography variant="h4"  sx={{ marginTop: 3 }}>Threshold</Typography>
 
       <Grid container>
         <Grid>
@@ -377,7 +391,7 @@ function Delegate() {
               <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
             </Alert>
           ) : (
-            <Alert severity="info">
+            <Alert severity="info" sx={{ marginTop: 2 }}>
               <Typography color="primary">
                 Proxy  {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
               </Typography>
@@ -386,14 +400,21 @@ function Delegate() {
         </div>
       ) : null}
 
-      <TextField
-        label="Nonce"
-        type="number"
-        value={nonce}
-        onChange={(e) => setNonce(parseInt(e.target.value))}
-        fullWidth
-        margin="normal"
-      />
+
+
+      {delegatee ? (
+          <Alert
+            severity="warning"
+            sx={{ marginTop: 2 }}
+            action={<Link to={"/settings"}>View storage</Link>}
+          >
+            <Typography sx={{ color: "orange" }}>
+              Account already delegated to address: {getShortAddress("0x" + delegatee.slice(8) as `0x${string}`)}.
+            </Typography>
+          </Alert>
+      ) : (
+        <Typography align="center">Account not delegated</Typography>
+      )}
 
       <Button
         variant="contained"
