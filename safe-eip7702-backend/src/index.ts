@@ -4,10 +4,11 @@ import cors from 'cors';
 dotenv.config();
 
 import { safeEIP7702Addresses } from "./config/addresses";
-import { client, walletClient } from './wallet';
+import { getPublicClient, getWalletClient } from './wallet';
 import { toHex, zeroHash, encodeFunctionData, zeroAddress } from 'viem';
 import { MultiSendABI } from './utils';
 import { encodeMultiSend, MetaTransaction } from './multisend';
+import SafeEIP7702ProxyFactoryArtifact from "./artifacts/SafeEIP7702ProxyFactory.json";
 
 declare global {
     interface BigInt {
@@ -45,9 +46,16 @@ app.post('/', async (req: Request, res: Response) => {
 
     if (initData) {
         console.log(`Init data provided for [${proxyAddress}] : [${initData}]`);
+        const publicClient = getPublicClient(chainId);
+
+        const proxyCalldata = encodeFunctionData({
+            abi: SafeEIP7702ProxyFactoryArtifact.abi,
+            functionName: 'createProxyWithNonce',
+            args: [addresses.safeSingleton, initData, BigInt(0)]
+        })
 
         // Check if proxy is already deployed
-        if (await client.getCode({ address: proxyAddress })) {
+        if (await publicClient.getCode({ address: proxyAddress })) {
             console.log("Proxy already deployed");
         } else {
             console.log(`Adding transaction to deploy proxy [${proxyAddress}]`);
@@ -55,14 +63,16 @@ app.post('/', async (req: Request, res: Response) => {
             transactions.push({
                 to: addresses.proxyFactory as `0x${string}`, // to: proxy factory address
                 value: BigInt(0), // value: 0
-                data: initData as `0x${string}`, // data: initData
+                data: proxyCalldata as `0x${string}`, // data: initData
                 operation: 0
             });
         }
     }
 
+    const publicClient = getPublicClient(chainId);
+
     // Check if EOA is already initialized
-    const slotZero = await client.getStorageAt({ address: from, slot: toHex(0) });
+    const slotZero = await publicClient.getStorageAt({ address: from, slot: toHex(0) });
     if (slotZero === zeroHash) {
         // Transaction to initialize EOA
         transactions.push({
@@ -84,7 +94,8 @@ app.post('/', async (req: Request, res: Response) => {
             const encodedTransactions = encodeMultiSend(transactions);
             const data = encodeFunctionData({ abi: MultiSendABI, functionName: 'multiSend', args: [encodedTransactions] });
 
-            console.log(`Encoded transactions: [${data}]`);
+            const walletClient = getWalletClient(chainId);
+            console.log(`Sending transaction on chain [${chainId}]`);
             // Need to provide gas parameters because estimateGas call fails when using authorizationList
             // Send the multiSend transaction
             txHash = await walletClient.sendTransaction({
@@ -93,20 +104,10 @@ app.post('/', async (req: Request, res: Response) => {
                 value: BigInt(0), // Value sent with the transaction
                 authorizationList
             });
-
-            // txHash = await walletClient.sendTransaction({
-            //     to: addresses.proxyFactory, // The address of the MultiSendCallOnly contract
-            //     data: initData, // MultiSend call
-            //     value: BigInt(0), // Value sent with the transaction
-            //     maxFeePerGas: BigInt(507000000000),
-            //     maxPriorityFeePerGas: BigInt(50700000000),
-            //     gasLimit: BigInt(50700000000000),
-            //     priorityFee: BigInt(50700000000),
-            // })
-
         } else {
             console.log("No transactions to relay. Adding sending empty transaction");
-            // transactions.push(getDefaultEmptyTransaction());
+            const walletClient = getWalletClient(chainId);
+            console.log(`Sending only authorization transaction on chain [${chainId}]`);
             txHash = await walletClient.sendTransaction({
                 to: zeroAddress,
                 data: "0x",
@@ -118,7 +119,7 @@ app.post('/', async (req: Request, res: Response) => {
         console.log(`Transaction hash: [${txHash}]`);
         res.status(201).json({ txHash: txHash });
     } catch (error) {
-        console.error("Failed to relay authorization:", error);
+        console.error("Failed to relay authorization", error);
         res.status(500).json({ error: error });
     }
 
