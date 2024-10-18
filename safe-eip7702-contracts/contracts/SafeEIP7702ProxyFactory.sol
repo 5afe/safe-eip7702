@@ -35,14 +35,14 @@ contract SafeEIP7702ProxyFactory {
         }
         require(address(proxy) != address(0), "Create2 call failed");
 
-        if (initializer.length > 0) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                if eq(call(gas(), proxy, 0, add(initializer, 0x20), mload(initializer), 0, 0), 0) {
-                    revert(0, 0)
-                }
-            }
-        }
+        // if (initializer.length > 0) {
+        //     // solhint-disable-next-line no-inline-assembly
+        //     assembly {
+        //         if eq(call(gas(), proxy, 0, add(initializer, 0x20), mload(initializer), 0, 0), 0) {
+        //             revert(0, 0)
+        //         }
+        //     }
+        // }
     }
 
     /**

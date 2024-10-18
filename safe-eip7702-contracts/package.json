@@ -38,6 +38,8 @@
     "solhint": "^5.0.3"
   },
   "dependencies": {
-    "@safe-global/safe-contracts": "1.4.1-build.0"
+    "@safe-global/safe-smart-account": "github:safe-global/safe-smart-account#feature/eip-7702",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }

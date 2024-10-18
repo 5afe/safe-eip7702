@@ -2,6 +2,7 @@ import React, { createContext, useState, ReactNode } from 'react';
 import { isHex, PrivateKeyAccount } from 'viem'; // Import viem library for validation
 import { privateKeyToAccount } from 'viem/accounts';
 import { Authorization } from 'viem/experimental';
+import { defaultChainId } from '../safe-eip7702-config/config';
 
 interface WalletContextType {
   privateKey: `0x${string}` | undefined;
@@ -24,7 +25,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [isPrivateKeyValid, setIsPrivateKeyValid] = useState<boolean>(true);
   const [account, setAccount] = useState<PrivateKeyAccount>(privateKeyToAccount(import.meta.env.VITE_PRIVATE_KEY));
   const [authorizations, setAuthorizations] = useState<Authorization[]>([]);
-  const [chainId, setChainId] = useState<number>(7011893082);
+  const [chainId, setChainId] = useState<number>(defaultChainId);
 
   // Function to validate the private key
   const validatePrivateKey = (key: `0x${string}` | undefined) => {
@@ -39,7 +40,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   return (
-    <WalletContext.Provider value={{ chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount  }}>
+    <WalletContext.Provider value={{ chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>
       {children}
     </WalletContext.Provider>
   );

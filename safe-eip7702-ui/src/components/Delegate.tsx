@@ -12,7 +12,7 @@ import {
 } from "viem";
 import { config } from "../wagmi";
 import { WalletContext } from "../context/WalletContext";
-import { safeEIP7702Addresses } from "../safe-eip7702-config/address";
+import { safeEIP7702Config } from "../safe-eip7702-config/config";
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
 import safeModuleSetup from "../safe-eip7702-config/artifact/SafeModuleSetup.json";
 import {
@@ -25,7 +25,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Box,
+  Box
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { waitForTransactionReceipt } from "wagmi/actions";
@@ -67,7 +67,7 @@ function Delegate() {
   const [error, setError] = useState<string>();
   const [canSign, setCanSign] = useState<boolean>(false);
 
-  const proxyFactory = safeEIP7702Addresses[chainId]?.addresses.proxyFactory;
+  const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
   useEffect(() => {
     const newInitData = calculateInitData() as `0x${string}`;
@@ -105,7 +105,7 @@ function Delegate() {
     if (account) {
       (async () => {
         const publicClient = createPublicClient({
-          transport: http(safeEIP7702Addresses[chainId].rpc),
+          transport: http(safeEIP7702Config[chainId].rpc),
         });
 
         const transactionCount = await publicClient.getTransactionCount({
@@ -148,7 +148,7 @@ function Delegate() {
     const moduleSetupData = encodeFunctionData({
       abi: safeModuleSetup.abi,
       functionName: "enableModules",
-      args: [[safeEIP7702Addresses[chainId].addresses.fallbackHandler]],
+      args: [[safeEIP7702Config[chainId].addresses.fallbackHandler]],
     });
 
     const setupCalldata = encodeFunctionData({
@@ -157,9 +157,9 @@ function Delegate() {
       args: [
         owners,
         threshold,
-        safeEIP7702Addresses[chainId].addresses.moduleSetup,
+        safeEIP7702Config[chainId].addresses.moduleSetup,
         moduleSetupData,
-        safeEIP7702Addresses[chainId].addresses.fallbackHandler,
+        safeEIP7702Config[chainId].addresses.fallbackHandler,
         "0x" + "00".repeat(20),
         0,
         "0x" + "00".repeat(20),
@@ -198,11 +198,11 @@ function Delegate() {
   };
 
   const walletClient = createWalletClient({
-    transport: http(safeEIP7702Addresses[chainId].rpc),
+    transport: http(safeEIP7702Config[chainId].rpc),
   }).extend(eip7702Actions());
 
   const publicClient = createPublicClient({
-    transport: http(safeEIP7702Addresses[chainId].rpc),
+    transport: http(safeEIP7702Config[chainId].rpc),
   });
 
   const handleSignAuthorization = async (chainId: number) => {
@@ -228,8 +228,8 @@ function Delegate() {
     }
 
     const calculatedProxyAddress = getProxyAddress(
-      safeEIP7702Addresses[chainId].addresses.proxyFactory,
-      safeEIP7702Addresses[chainId].addresses.safeSingleton,
+      safeEIP7702Config[chainId].addresses.proxyFactory,
+      safeEIP7702Config[chainId].addresses.safeSingleton,
       initData,
       proxyCreationSalt
     );
@@ -265,7 +265,7 @@ function Delegate() {
           <Typography>Safe Singleton</Typography>
         </Grid>
         <Grid size={8}>
-          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.safeSingleton}</Typography>
+          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.safeSingleton}</Typography>
         </Grid>
       </Grid>
 
@@ -274,7 +274,7 @@ function Delegate() {
           <Typography>Fallback Handler</Typography>
         </Grid>
         <Grid size={8}>
-          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
         </Grid>
       </Grid>
 
@@ -283,7 +283,7 @@ function Delegate() {
           <Typography>Module Setup</Typography>
         </Grid>
         <Grid size={8}>
-          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.moduleSetup}</Typography>
+          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.moduleSetup}</Typography>
         </Grid>
       </Grid>
 
@@ -292,7 +292,7 @@ function Delegate() {
           <Typography>Module</Typography>
         </Grid>
         <Grid size={8}>
-          <Typography align="left">{safeEIP7702Addresses[chainId]?.addresses.fallbackHandler}</Typography>
+          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
         </Grid>
       </Grid>
 
@@ -307,7 +307,7 @@ function Delegate() {
 
       <Grid container >
         <Grid size={4}>
-          <Typography>Proxy Creation salt</Typography>
+          <Typography>Proxy Creation Salt</Typography>
         </Grid>
         <Grid size={8}>
           <Typography align="left">{proxyCreationSalt.toString()}</Typography>
@@ -443,7 +443,7 @@ function Delegate() {
         <Typography align="center">Waiting for transaction to confirm</Typography>
       ) : null}
 
-      {loading && <CircularProgress />}
+      {loading && <Grid container justifyContent="center"><CircularProgress /> </Grid> }
       {error && (
         <Alert severity="error" sx={{ bgcolor: "background.paper" }}>
           <Typography sx={{ color: "red" }}>{error}</Typography>

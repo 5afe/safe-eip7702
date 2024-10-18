@@ -84,3 +84,7 @@ export const getDelegatedToAddress = async (
     
     return `0x${codeAtEOA.slice(8)}` as Address;
 };
+
+export const getShortAddress = (address: Address): string => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}

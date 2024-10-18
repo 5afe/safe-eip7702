@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { safeEIP7702Addresses } from "./config/addresses";
-
 dotenv.config();
+
+import { safeEIP7702Addresses } from "./config/addresses";
 import { client, walletClient } from './wallet';
 import { toHex, zeroHash, encodeFunctionData, zeroAddress } from 'viem';
-import { MetaTransaction, getDefaultEmptyTransaction, encodeMultiSend, MultiSendABI } from './utils';
-
+import { MultiSendABI } from './utils';
+import { encodeMultiSend, MetaTransaction } from './multisend';
 
 declare global {
     interface BigInt {
@@ -44,6 +44,8 @@ app.post('/', async (req: Request, res: Response) => {
     let transactions: MetaTransaction[] = [];
 
     if (initData) {
+        console.log(`Init data provided for [${proxyAddress}] : [${initData}]`);
+
         // Check if proxy is already deployed
         if (await client.getCode({ address: proxyAddress })) {
             console.log("Proxy already deployed");
@@ -53,7 +55,8 @@ app.post('/', async (req: Request, res: Response) => {
             transactions.push({
                 to: addresses.proxyFactory as `0x${string}`, // to: proxy factory address
                 value: BigInt(0), // value: 0
-                data: initData as `0x${string}` // data: initData
+                data: initData as `0x${string}`, // data: initData
+                operation: 0
             });
         }
     }
@@ -65,7 +68,8 @@ app.post('/', async (req: Request, res: Response) => {
         transactions.push({
             to: from, // to: EOA address
             value: BigInt(0), // value: 0
-            data: initData // data: Init data
+            data: initData, // data: Init data
+            operation: 0
         });
         console.log(`Added transaction to initialize EOA [${from}]`);
     }
@@ -78,22 +82,27 @@ app.post('/', async (req: Request, res: Response) => {
         if (transactions.length > 0) {
             // Encode all transactions into a single byte string for multiSend
             const encodedTransactions = encodeMultiSend(transactions);
-
             const data = encodeFunctionData({ abi: MultiSendABI, functionName: 'multiSend', args: [encodedTransactions] });
 
-
+            console.log(`Encoded transactions: [${data}]`);
             // Need to provide gas parameters because estimateGas call fails when using authorizationList
             // Send the multiSend transaction
             txHash = await walletClient.sendTransaction({
-                to: addresses.multiSendCallOnly, // The address of the MultiSendCallOnly contract
+                to: addresses["multiSendCallOnly"], // The address of the MultiSendCallOnly contract
                 data: data, // MultiSend call
                 value: BigInt(0), // Value sent with the transaction
-                authorizationList,
-                maxFeePerGas: BigInt(500000000000),
-                maxPriorityFeePerGas: BigInt(50000000000),
-                gasLimit: BigInt(50000000000000),
-                priorityFee: BigInt(50000000000),
+                authorizationList
             });
+
+            // txHash = await walletClient.sendTransaction({
+            //     to: addresses.proxyFactory, // The address of the MultiSendCallOnly contract
+            //     data: initData, // MultiSend call
+            //     value: BigInt(0), // Value sent with the transaction
+            //     maxFeePerGas: BigInt(507000000000),
+            //     maxPriorityFeePerGas: BigInt(50700000000),
+            //     gasLimit: BigInt(50700000000000),
+            //     priorityFee: BigInt(50700000000),
+            // })
 
         } else {
             console.log("No transactions to relay. Adding sending empty transaction");

@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid2';
 import { WalletContext } from '../context/WalletContext';
 import { readStorage, SafeStorage, SENTINEL_ADDRESS } from '../utils/storageReader';
 import { createPublicClient, getContract, http, isAddressEqual } from 'viem';
-import { safeEIP7702Addresses } from '../safe-eip7702-config/address';
+import { safeEIP7702Config } from '../safe-eip7702-config/config';
 import { ACCOUNT_CODE_PREFIX } from '../utils/utils';
 import safeArtifact from "../safe-eip7702-config/artifact/Safe.json"
 
@@ -21,7 +21,7 @@ const Settings: React.FC = () => {
 
 
   const publicClient = createPublicClient({
-    transport: http(safeEIP7702Addresses[chainId].rpc),
+    transport: http(safeEIP7702Config[chainId].rpc),
   });
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Settings: React.FC = () => {
         setIsDelegated(true);
       }
 
-      if (isAddressEqual(storage.singleton, safeEIP7702Addresses[chainId].addresses.safeSingleton)) {
+      if (isAddressEqual(storage.singleton, safeEIP7702Config[chainId].addresses.safeSingleton)) {
 
         setIsDelegatedToSafeSingleton(true);
 
