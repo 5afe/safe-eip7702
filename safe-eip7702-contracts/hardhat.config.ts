@@ -69,7 +69,7 @@ const config: HardhatUserConfig = {
         },
         pectra:{
             ...sharedNetworkConfig,
-            url: "https://rpc.pectra-devnet-3.ethpandaops.io",
+            url: "https://rpc.pectra-devnet-4.ethpandaops.io",
             gasPrice: 50_000_000_000,
             gas: 1_000_000_000,
             timeout: 100000000,

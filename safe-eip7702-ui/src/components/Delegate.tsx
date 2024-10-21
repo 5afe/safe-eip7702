@@ -188,6 +188,7 @@ function Delegate() {
       setIsWaitingForTransactionReceipt(true);
       await waitForTransactionReceipt(config, {
         hash: result.txHash,
+        pollingInterval: import.meta.env.VITE_TRANSACTION_POOLING_INTERVAL || 12_000,
       });
       setIsWaitingForTransactionReceipt(false);
     } else {

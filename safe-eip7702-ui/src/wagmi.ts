@@ -4,7 +4,7 @@ import { mainnet, sepolia } from "wagmi/chains";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 
 // export const pectraDevnet = defineChain({
-//   id: 7011893082,
+//   id: 7042905162,
 //   name: "pectra-devnet-3",
 //   nativeCurrency: {
 //     name: "Ethereum",

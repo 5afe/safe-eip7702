@@ -1,9 +1,9 @@
 export const safeEIP7702Config: any = {
-  7011893082: {
-    rpc: import.meta.env.VITE_PECTRA_RPC_URL || "https://rpc.pectra-devnet-3.ethpandaops.io",
-    name: "pectra-devnet-3",
+  7042905162: {
+    rpc: import.meta.env.VITE_PECTRA_RPC_URL,
+    name: "pectra-devnet-4",
     addresses: {
-      proxyFactory: "0x05E74aC068A4586dbf934Fea3F3C1D76FC74E8Af",
+      proxyFactory: "0xE60EcE6588DCcFb7373538034963B4D20a280DB0",
       safeSingleton: "0xCfaA26AD40bFC7E3b1642E1888620FC402b95dAB",
       fallbackHandler: "0x0F71638a741E7fe77E6A2D9986BA175b95F209d4",
       moduleSetup: "0x2204DcA7d254897ae6d815D2189032db87F50Bba",

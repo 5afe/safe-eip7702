@@ -11,18 +11,18 @@ contract SafeEIP7702Proxy is SafeProxy {
     constructor(bytes32 setupDataHash, address singleton) SafeProxy(singleton) {
         SETUP_DATA_HASH = setupDataHash;
         SINGLETON = singleton;
-        
-        // TODO: Make proxy unusable?
-        // /**
-        //  * By setting the threshold it is not possible to call setup anymore,
-        //  * so we create a Safe with 0 owners and threshold 1.
-        //  * This is an unusable Safe Proxy
-        //  */
-        // /* solhint-disable no-inline-assembly */
-        // /// @solidity memory-safe-assembly
-        // assembly {
-        //     sstore(4, 1)
-        // }
+
+        // Make proxy unusable
+        /**
+         * By setting the threshold it is not possible to call setup anymore,
+         * so we create a Safe with 0 owners and threshold 1.
+         * This is an unusable Safe Proxy
+         */
+        /* solhint-disable no-inline-assembly */
+        /// @solidity memory-safe-assembly
+        assembly {
+            sstore(4, 1)
+        }
         // /* solhint-enable no-inline-assembly */
     }
 

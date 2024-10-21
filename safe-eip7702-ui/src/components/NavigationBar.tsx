@@ -36,7 +36,7 @@ const NavigationBar: React.FC = () => {
   };
 
   const handleChainSelect = (selectedChainId: string) => {
-    setChainId(selectedChainId); // Update the selected chainId in context
+    setChainId(parseInt(selectedChainId)); // Update the selected chainId in context
     handleChainMenuClose(); // Close the chain selection menu
   };
 
