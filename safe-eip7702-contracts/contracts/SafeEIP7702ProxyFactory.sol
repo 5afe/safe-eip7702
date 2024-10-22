@@ -34,15 +34,6 @@ contract SafeEIP7702ProxyFactory {
             proxy := create2(0x0, add(0x20, deploymentData), mload(deploymentData), salt)
         }
         require(address(proxy) != address(0), "Create2 call failed");
-
-        if (initializer.length > 0) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                if eq(call(gas(), proxy, 0, add(initializer, 0x20), mload(initializer), 0, 0), 0) {
-                    revert(0, 0)
-                }
-            }
-        }
     }
 
     /**

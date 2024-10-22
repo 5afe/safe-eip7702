@@ -23,7 +23,12 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@types/chai": "4",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.7",
+    "@types/yargs": "^17.0.33",
+    "chai": "4",
     "dotenv": "^16.4.5",
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
@@ -35,9 +40,13 @@
     "hardhat-deploy-ethers": "^0.4.2",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
-    "solhint": "^5.0.3"
+    "rimraf": "^6.0.1",
+    "solhint": "^5.0.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@safe-global/safe-contracts": "1.4.1-build.0"
+    "@safe-global/safe-smart-account": "github:safe-global/safe-smart-account#feature/eip-7702"
   }
 }

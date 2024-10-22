@@ -1,0 +1,12 @@
+participants:
+  - el_type: reth
+    cl_type: lighthouse
+    el_image: ethpandaops/reth:onbjerg-devnet-3-ed42356
+    cl_image: ethpandaops/lighthouse:unstable-48dd3f3
+    count: 3
+network_params:
+  network_id: "12121211"
+  electra_fork_epoch: 1
+  prefunded_accounts: '{"0x627306090abaB3A6e1400e9345bC60c78a8BEf57": {"balance": "100ETH"}, "0x3c0e89424E2BB146739b206DBbD72948d2085b3d": {"balance": "100ETH"}, "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef": {"balance": "100ETH"}}'
+additional_services:
+  - dora

@@ -2,7 +2,7 @@ import { AddressLike, Provider } from "ethers";
 import { FALLBACK_HANDLER_STORAGE_SLOT, GUARD_STORAGE_SLOT, readModuleStorageSlot, readOwnerStorageSlot, SENTINEL_ADDRESS } from "./safe";
 import { ethers } from "hardhat";
 import { ACCOUNT_CODE_PREFIX } from "../eip7702/helper";
-import SafeL2 from "@safe-global/safe-contracts/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
+import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
 
 export const readStorage = async (provider: Provider, account: AddressLike) => {
     console.log("---- fallback handler ----");
@@ -17,7 +17,7 @@ export const readStorage = async (provider: Provider, account: AddressLike) => {
     }
 };
 
-const printAccountStorage = async (provider: Provider, account: AddressLike, safeSingleton: AddressLike | null) => {
+export const printAccountStorage = async (provider: Provider, account: AddressLike, safeSingleton: AddressLike | null) => {
     await readStorage(provider, account);
     console.log("account: ", account.toString());
     console.log("code: ", await provider.getCode(account));

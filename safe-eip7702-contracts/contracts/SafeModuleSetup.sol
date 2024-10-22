@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity 0.8.27;
 
-import {ISafe} from "./interfaces/ISafe.sol";
+import {ISafe} from "@safe-global/safe-smart-account/contracts/interfaces/ISafe.sol";
 
 /**
  * @title SafeModuleSetup - A utility contract for setting up a Safe with modules.

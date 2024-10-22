@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity 0.8.27;
-import {SafeProxy} from "@safe-global/safe-contracts/contracts/proxies/SafeProxy.sol";
+import {SafeProxy} from "@safe-global/safe-smart-account/contracts/proxies/SafeProxy.sol";
 
 contract SafeEIP7702Proxy is SafeProxy {
     bytes32 internal immutable SETUP_DATA_HASH;
@@ -11,6 +11,19 @@ contract SafeEIP7702Proxy is SafeProxy {
     constructor(bytes32 setupDataHash, address singleton) SafeProxy(singleton) {
         SETUP_DATA_HASH = setupDataHash;
         SINGLETON = singleton;
+
+        // Make proxy unusable
+        /**
+         * By setting the threshold it is not possible to call setup anymore,
+         * so we create a Safe with 0 owners and threshold 1.
+         * This is an unusable Safe Proxy
+         */
+        /* solhint-disable no-inline-assembly */
+        /// @solidity memory-safe-assembly
+        assembly {
+            sstore(4, 1)
+        }
+        // /* solhint-enable no-inline-assembly */
     }
 
     function setup(

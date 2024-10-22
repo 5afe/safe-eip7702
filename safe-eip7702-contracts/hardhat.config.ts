@@ -1,5 +1,5 @@
 import { HardhatUserConfig } from "hardhat/config";
-import '@nomicfoundation/hardhat-ethers';
+import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-toolbox";
 import dotenv from "dotenv";
 import 'hardhat-deploy'
@@ -7,7 +7,7 @@ import { HttpNetworkUserConfig } from "hardhat/types";
 
 dotenv.config();
 
-const { CUSTOM_NODE_URL } = process.env;
+const { CUSTOM_NODE_URL, LOCALHOST_NODE_URL } = process.env;
 
 // const DEFAULT_MNEMONIC = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 // Function to get all keys matching the pattern PK{number}
@@ -56,7 +56,8 @@ const config: HardhatUserConfig = {
     },
     networks: {
         localhost: {
-            url: "http://localhost:8545",
+            ...sharedNetworkConfig,
+            url: LOCALHOST_NODE_URL || "http://localhost:8545",
             allowUnlimitedContractSize: true
         },
         hardhat: {
@@ -68,7 +69,7 @@ const config: HardhatUserConfig = {
         },
         pectra:{
             ...sharedNetworkConfig,
-            url: "https://rpc.pectra-devnet-3.ethpandaops.io",
+            url: "https://rpc.pectra-devnet-4.ethpandaops.io",
             gasPrice: 50_000_000_000,
             gas: 1_000_000_000,
             timeout: 100000000,
@@ -80,6 +81,8 @@ const config: HardhatUserConfig = {
     },
     namedAccounts: {
       deployer: 0,
+      relayer: 1,
+      delegator: 2
     },
     mocha: {
         timeout: 100000000
