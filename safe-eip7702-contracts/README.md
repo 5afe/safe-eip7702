@@ -87,6 +87,13 @@ sequenceDiagram
 
 ## Alternative approaches
 
+1. **EOA Delegation to Safe Singleton**
+
+    - EOA delegates to a Safe Singleton contract.
+    - The Singleton has to be adapted for EIP-7702.
+    - Pro: No need of proxy deployment and proxy factory.
+    - Con: EOA has to sign the initialization data. Compared to the proxy approach, this is an additional step for the EOA to sign the initialization data.
+
 ### Useful links
 
 - [Pectra Faucet](https://faucet.pectra-devnet-3.ethpandaops.io/)
