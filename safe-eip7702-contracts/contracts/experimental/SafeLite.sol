@@ -7,6 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 contract SafeLite {
     address private immutable MULTISEND_SINGLETON;
+    address private immutable FALLBACK_HANDLER;
     uint256 public nonce;
 
     // Custom error types
@@ -20,8 +21,9 @@ contract SafeLite {
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     bytes32 public constant MULTISEND_TYPEHASH = keccak256("MultiSend(bytes32 data,uint256 nonce)");
 
-    constructor() {
+    constructor(address fallbackHandler) {
         MULTISEND_SINGLETON = address(this);
+        FALLBACK_HANDLER = fallbackHandler;
     }
 
     /**
@@ -61,7 +63,11 @@ contract SafeLite {
         assembly {
             let length := mload(transactions)
             let i := 0x20
-            for {} lt(i, length) {} {
+            for {
+
+            } lt(i, length) {
+
+            } {
                 let operation := shr(0xf8, mload(add(transactions, i)))
                 let to := shr(0x60, mload(add(transactions, add(i, 0x01))))
                 to := or(to, mul(iszero(to), address()))
@@ -125,5 +131,44 @@ contract SafeLite {
 
         // Recover the signer address
         return ecrecover(hash, v, r, s);
+    }
+
+    // @notice Forwards all calls to the fallback handler if set. Returns 0 if no handler is set.
+    // @dev Appends the non-padded caller address to the calldata to be optionally used in the handler
+    //      The handler can make us of `HandlerContext.sol` to extract the address.
+    //      This is done because in the next call frame the `msg.sender` will be FallbackManager's address
+    //      and having the original caller address may enable additional verification scenarios.
+    // solhint-disable-next-line payable-fallback,no-complex-fallback
+    fallback() external {
+        address handler = FALLBACK_HANDLER;
+        /* solhint-disable no-inline-assembly */
+        /// @solidity memory-safe-assembly
+        assembly {
+            // When compiled with the optimizer, the compiler relies on a certain assumptions on how the
+            // memory is used, therefore we need to guarantee memory safety (keeping the free memory point 0x40 slot intact,
+            // not going beyond the scratch space, etc)
+            // Solidity docs: https://docs.soliditylang.org/en/latest/assembly.html#memory-safety
+
+            if iszero(handler) {
+                return(0, 0)
+            }
+
+            let ptr := mload(0x40)
+            calldatacopy(ptr, 0, calldatasize())
+
+            // The msg.sender address is shifted to the left by 12 bytes to remove the padding
+            // Then the address without padding is stored right after the calldata
+            mstore(add(ptr, calldatasize()), shl(96, caller()))
+
+            // Add 20 bytes for the address appended add the end
+            let success := call(gas(), handler, 0, ptr, add(calldatasize(), 20), 0, 0)
+
+            returndatacopy(ptr, 0, returndatasize())
+            if iszero(success) {
+                revert(ptr, returndatasize())
+            }
+            return(ptr, returndatasize())
+        }
+        /* solhint-enable no-inline-assembly */
     }
 }
