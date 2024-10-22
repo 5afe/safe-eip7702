@@ -1,5 +1,4 @@
 import { deployments, ethers } from "hardhat";
-import hre from "hardhat";
 import {
     getSafeSingleton,
     getIDAFallbackHandler,
@@ -8,7 +7,7 @@ import {
     getSafeAtAddress,
     getClearStorageHelper,
     getSafeModuleSetup,
-} from "./utils/setup";
+} from "../src/utils/setup";
 import { AddressLike, SigningKey } from "ethers";
 import { execTransaction, getSetupData, GUARD_STORAGE_SLOT, readModuleStorageSlot, readOwnerStorageSlot } from "../src/utils/safe";
 import { expect } from "chai";
@@ -20,7 +19,7 @@ import { isAccountDelegatedToAddress } from "../src/eip7702/storage";
 describe("EIP7702", () => {
     const setupTests = deployments.createFixture(async ({ deployments }) => {
         await deployments.fixture();
-        const [deployer, relayer, delegator] = await ethers.getSigners();
+        const [deployer, relayer, delegator] = await (ethers as any).getSigners();
         const fallbackHandler = await getIDAFallbackHandler();
         const safeSingleton = await getSafeSingleton();
         const safeCompatibilityFallbackHandler = await getCompatibilityFallbackHandler();
@@ -41,7 +40,7 @@ describe("EIP7702", () => {
     });
 
     const assertEmptyAccountStorage = async (account: AddressLike) => {
-        const provider = ethers.provider;
+        const provider = (ethers as any).provider;
         expect(await provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
         expect(await provider.getStorage(account, GUARD_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
 
@@ -57,12 +56,12 @@ describe("EIP7702", () => {
     };
 
     describe("Test SafeEIP7702Proxy", function () {
-        it.only("Give authority to SafeEIP7702Proxy", async () => {
+        it("Give authority to SafeEIP7702Proxy", async () => {
             const { safeSingleton, fallbackHandler, relayer, deployer, delegator, safeModuleSetup, safeEIP7702ProxyFactory } =
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
-            const provider = ethers.provider;
+            const provider = (ethers as any).provider;
 
             const delegatorSigningKey = new ethers.Wallet(pkDelegator, provider);
             const relayerSigningKey = new SigningKey(pkRelayer);
@@ -71,7 +70,7 @@ describe("EIP7702", () => {
             const authNonce = BigInt(await delegatorSigningKey.getNonce());
 
             // Deploy SafeProxy with the delegator as owner
-            const owners = [await deployer.getAddress()];            
+            const owners = [await deployer.getAddress()];
             const fallbackHandlerAddress = await fallbackHandler.getAddress();
             const data = getSetupData(owners, 1, await safeModuleSetup.getAddress(), [fallbackHandlerAddress], fallbackHandlerAddress);
 
@@ -93,7 +92,7 @@ describe("EIP7702", () => {
             const account = await delegator.getAddress();
 
             const isAlreadyDelegated = await isAccountDelegatedToAddress(provider, await delegator.getAddress(), authAddress);
-            if (isAlreadyDelegated && (await provider.getStorage(account, 4) == (ethers.zeroPadValue("0x01", 32)))) {
+            if (isAlreadyDelegated && (await provider.getStorage(account, 4)) == ethers.zeroPadValue("0x01", 32)) {
                 console.log("Account already delegated to Safe Proxy and storage is setup. Returning");
                 return;
             }
@@ -132,13 +131,21 @@ describe("EIP7702", () => {
             );
             expect(await readOwnerStorageSlot(provider, account, SENTINEL_ADDRESS)).to.equal(ethers.zeroPadValue(owners[0], 32));
 
-           // const tx = await execTransaction(relayer, [deployer], await getSafeAtAddress(account), await deployer.getAddress(), "1", "0x", "0");
-           // console.log("Transfer value txHash", (await tx.wait())?.hash);
+            const tx = await execTransaction(
+                relayer,
+                [deployer],
+                await getSafeAtAddress(account),
+                await deployer.getAddress(),
+                "1",
+                "0x",
+                "0",
+            );
+            console.log("Transfer value txHash", (await tx.wait())?.hash);
         });
 
         it("Revoke authority and clear storage", async () => {
             const { relayer, delegator, clearStorageHelper } = await setupTests();
-            const provider = ethers.provider;
+            const provider = (ethers as any).provider;
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
 
@@ -173,7 +180,7 @@ describe("EIP7702", () => {
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
-            const provider = ethers.provider;
+            const provider = (ethers as any).provider;
 
             const delegatorWallet = new ethers.Wallet(pkDelegator, provider);
             const relayerSigningKey = new SigningKey(pkRelayer);
@@ -214,7 +221,8 @@ describe("EIP7702", () => {
             expect(txSetupReceipt?.status === 1, "Transaction failed");
 
             const safe = await getSafeAtAddress(account);
-            const data = fallbackHandler.interface.encodeFunctionData("onRedelegation", []);
+            const interfaceOnRedelegation = new ethers.Interface(["function onRedelegation()"]);
+            const data = interfaceOnRedelegation.encodeFunctionData("onRedelegation", []);
             const txResponse = await execTransaction(relayer, owners, safe, account, "0", data, "0");
             const txReceipt = await txResponse.wait();
             expect(txReceipt !== null && txReceipt.status === 1, "Transaction failed");

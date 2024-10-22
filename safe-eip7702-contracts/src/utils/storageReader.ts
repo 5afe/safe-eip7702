@@ -17,7 +17,7 @@ export const readStorage = async (provider: Provider, account: AddressLike) => {
     }
 };
 
-const printAccountStorage = async (provider: Provider, account: AddressLike, safeSingleton: AddressLike | null) => {
+export const printAccountStorage = async (provider: Provider, account: AddressLike, safeSingleton: AddressLike | null) => {
     await readStorage(provider, account);
     console.log("account: ", account.toString());
     console.log("code: ", await provider.getCode(account));

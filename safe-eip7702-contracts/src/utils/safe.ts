@@ -1,7 +1,8 @@
 import { ethers } from "hardhat";
-import { ISafe, SafeModuleSetup } from "../../typechain-types";
+import { SafeModuleSetup } from "../../typechain-types";
 import { AddressLike, ContractTransactionResponse, Provider, Signer } from "ethers";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
+import { ISafe } from "@safe-global/safe-smart-account/dist/typechain-types";
 
 export const execTransaction = async (
     relayer: Signer,
@@ -12,9 +13,9 @@ export const execTransaction = async (
     data: string,
     operation: string,
 ): Promise<ContractTransactionResponse> => {
-    let nonce = await safe.nonce();
+    const nonce = await safe.nonce();
 
-    let transactionHash = await safe.getTransactionHash(to, value, data, operation, 0, 0, 0, ethers.ZeroAddress, ethers.ZeroAddress, nonce);
+    const transactionHash = await safe.getTransactionHash(to, value, data, operation, 0, 0, 0, ethers.ZeroAddress, ethers.ZeroAddress, nonce);
     let signatureBytes = "0x";
     let bytesDataHash = ethers.toBeArray(transactionHash);
 

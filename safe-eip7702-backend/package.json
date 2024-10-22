@@ -22,7 +22,8 @@
     "express": "^4.21.0",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
     "viem": "^2.21.19"
