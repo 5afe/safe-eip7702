@@ -44,22 +44,23 @@ __Note:__ This contract does not implement any verification logic.
 ### Setup
 
 1. Copy `.env.example` to `.env` and update the values 
-2. Compile the scripts using the following command:
-
-```bash
-    npm run build:ts
-```
-3. Make sure the contracts are deployed on the network and `hardhat.config.ts` has appropriate values for the network.
+2. Make sure the contracts are deployed on the network and `hardhat.config.ts` has appropriate values for the network.
 
 ### 1. Set code to Safe Proxy
 
 ```bash
-    npx hardhat run dist/src/scripts/1_set_code.js --network pectra
+    npx hardhat run src/scripts/1_set_code.ts --network pectra
 ```
 
 ### 2. Execute transaction
 ```bash
-    npx hardhat run dist/src/scripts/2_transact.js --network pectra  
+    npx hardhat run src/scripts/2_execute.ts --network pectra
+```
+
+
+### 3. Execute multi-send transaction
+```bash
+    npx hardhat run src/scripts/3_batch_execute.ts --network pectra
 ```
 
 ## Sequence Diagram

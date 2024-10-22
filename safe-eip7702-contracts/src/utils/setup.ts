@@ -3,6 +3,8 @@ import { IDAFallbackHandler, ISafe } from "../../typechain-types";
 import SafeProxyFactory from "@safe-global/safe-smart-account/build/artifacts/contracts/proxies/SafeProxyFactory.sol/SafeProxyFactory.json";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
 import CompatibilityFallbackHandler from "@safe-global/safe-smart-account/build/artifacts/contracts/handler/CompatibilityFallbackHandler.sol/CompatibilityFallbackHandler.json";
+import MultiSendCallOnly from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSendCallOnly.sol/MultiSendCallOnly.json";
+import MultiSend from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSend.sol/MultiSend.json";
 
 export const getIDAFallbackHandler = async (): Promise<IDAFallbackHandler> => {
     const fallbackHandler = await hre.deployments.get("IDAFallbackHandler");
@@ -45,5 +47,10 @@ export const getSafeEIP7702ProxyFactory = async () => {
 
 export const getMultiSendCallOnly = async () => {
     const multiSendCallOnly = await hre.deployments.get("MultiSendCallOnly");
-    return ethers.getContractAt("MultiSendCallOnly", multiSendCallOnly.address);
+    return ethers.getContractAt(MultiSendCallOnly.abi, multiSendCallOnly.address);
+};
+
+export const getMultiSend = async () => {
+    const multiSend = await hre.deployments.get("MultiSend");
+    return ethers.getContractAt(MultiSend.abi, multiSend.address);
 };

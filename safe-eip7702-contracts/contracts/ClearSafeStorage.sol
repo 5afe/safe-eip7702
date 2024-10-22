@@ -28,7 +28,12 @@ contract ClearSafeStorage is SafeStorage {
 
     function _clearStorage() internal {
         address safe = msg.sender;
-        ISafe(safe).execTransactionFromModule(address(this), 0, abi.encode(this.clearSafeStorageDelegateCallReciever.selector), Enum.Operation.DelegateCall);
+        ISafe(safe).execTransactionFromModule(
+            address(this),
+            0,
+            abi.encode(this.clearSafeStorageDelegateCallReciever.selector),
+            Enum.Operation.DelegateCall
+        );
     }
 
     function _removeAllOwners() internal {

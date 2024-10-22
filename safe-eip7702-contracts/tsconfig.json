@@ -8,5 +8,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "./dist"
-  }
+  },
+  "include": ["src/**/*.ts", "hardhat.config.ts", "test/**/*.ts", "typechain-types"]
 }

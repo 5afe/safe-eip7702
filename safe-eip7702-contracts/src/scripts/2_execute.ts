@@ -2,9 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { deployments, ethers } from "hardhat";
 import { execTransaction } from "../utils/safe";
-import {
-    getSafeAtAddress,
-} from "../utils/setup";
+import { getSafeAtAddress } from "../utils/setup";
 import { Provider } from "ethers";
 
 const setup = async (provider: Provider) => {
@@ -20,9 +18,8 @@ const setup = async (provider: Provider) => {
 };
 
 const main = async () => {
-    const rpc = process.env.RPC_URL;
-    const provider = new ethers.JsonRpcProvider(rpc);
-    const { relayer, delegator } = await setup(provider);
+    const provider = ethers.provider;
+    const { relayer, delegator } = await setup(ethers.provider);
     const owners = [delegator];
     const account = await delegator.getAddress();
     console.log(`Using account [${account}]`);
@@ -38,7 +35,7 @@ const main = async () => {
 
     // Transfer value from the account
     const tx = await execTransaction(relayer, owners, safe, await relayer.getAddress(), amount.toString(), "0x", "0");
-    console.log("Transfer value txHash", (await tx.wait())?.hash);
+    console.log(`Transaction hash [${(await tx.wait())?.hash}]`);
 };
 
 main().catch((error) => {

@@ -15,7 +15,18 @@ export const execTransaction = async (
 ): Promise<ContractTransactionResponse> => {
     const nonce = await safe.nonce();
 
-    const transactionHash = await safe.getTransactionHash(to, value, data, operation, 0, 0, 0, ethers.ZeroAddress, ethers.ZeroAddress, nonce);
+    const transactionHash = await safe.getTransactionHash(
+        to,
+        value,
+        data,
+        operation,
+        0,
+        0,
+        0,
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
+        nonce,
+    );
     let signatureBytes = "0x";
     let bytesDataHash = ethers.toBeArray(transactionHash);
 

@@ -19,7 +19,7 @@ import { isAccountDelegatedToAddress } from "../src/eip7702/storage";
 describe("EIP7702", () => {
     const setupTests = deployments.createFixture(async ({ deployments }) => {
         await deployments.fixture();
-        const [deployer, relayer, delegator] = await (ethers as any).getSigners();
+        const [deployer, relayer, delegator] = await ethers.getSigners();
         const fallbackHandler = await getIDAFallbackHandler();
         const safeSingleton = await getSafeSingleton();
         const safeCompatibilityFallbackHandler = await getCompatibilityFallbackHandler();
@@ -40,7 +40,7 @@ describe("EIP7702", () => {
     });
 
     const assertEmptyAccountStorage = async (account: AddressLike) => {
-        const provider = (ethers as any).provider;
+        const provider = ethers.provider;
         expect(await provider.getStorage(account, FALLBACK_HANDLER_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
         expect(await provider.getStorage(account, GUARD_STORAGE_SLOT)).to.equal(ethers.ZeroHash);
 
@@ -61,7 +61,7 @@ describe("EIP7702", () => {
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
-            const provider = (ethers as any).provider;
+            const provider = ethers.provider;
 
             const delegatorSigningKey = new ethers.Wallet(pkDelegator, provider);
             const relayerSigningKey = new SigningKey(pkRelayer);
@@ -145,7 +145,7 @@ describe("EIP7702", () => {
 
         it("Revoke authority and clear storage", async () => {
             const { relayer, delegator, clearStorageHelper } = await setupTests();
-            const provider = (ethers as any).provider;
+            const provider = ethers.provider;
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
 
@@ -180,7 +180,7 @@ describe("EIP7702", () => {
                 await setupTests();
             const pkDelegator = process.env.PK3 || "";
             const pkRelayer = process.env.PK2 || "";
-            const provider = (ethers as any).provider;
+            const provider = ethers.provider;
 
             const delegatorWallet = new ethers.Wallet(pkDelegator, provider);
             const relayerSigningKey = new SigningKey(pkRelayer);

@@ -18,3 +18,4 @@ ignition/deployments/chain-31337
 /build
 deployments/*/solcInputs
 deployments/localhost
+dist
