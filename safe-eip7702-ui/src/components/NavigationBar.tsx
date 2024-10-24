@@ -72,6 +72,7 @@ const NavigationBar: React.FC = () => {
           <Button
             component={Link}
             to="/delegate"
+            variant="contained"
             disabled={!isPrivateKeyValid}
             sx={{
               marginRight: 2,
@@ -82,13 +83,14 @@ const NavigationBar: React.FC = () => {
 
           <Button
             component={Link}
+            variant="contained"
             to="/settings"
             disabled={!isPrivateKeyValid}
             sx={{
               marginRight: 2,
             }}
           >
-            Settings
+            View Storage
           </Button>
         </Box>
 
