@@ -2,6 +2,7 @@ export const safeEIP7702Config: any = {
   7042905162: {
     rpc: import.meta.env.VITE_PECTRA_RPC_URL,
     name: "pectra-devnet",
+    explorer : "https://explorer.pectra-devnet-4.ethpandaops.io",
     addresses: {
       proxyFactory: "0xE60EcE6588DCcFb7373538034963B4D20a280DB0",
       safeSingleton: "0xCfaA26AD40bFC7E3b1642E1888620FC402b95dAB",
@@ -14,6 +15,7 @@ export const safeEIP7702Config: any = {
   [parseInt(import.meta.env.VITE_NETWORK_ID) || "" ]: {
     rpc: import.meta.env.VITE_RPC_URL,
     name: import.meta.env.VITE_NETWORK_NAME,
+    explorer : import.meta.env.VITE_EXPLORER_URL,
     addresses: {
       proxyFactory: import.meta.env.VITE_PROXY_FACTORY,
       safeSingleton: import.meta.env.VITE_SAFE_SINGLETON,

@@ -262,86 +262,79 @@ function Delegate() {
         Delegation Config
       </Typography>
 
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Proxy Factory</Typography>
+      <Grid container size={12}>
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Proxy Factory</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{proxyFactory}</Typography>
+          </Grid>
         </Grid>
-        <Grid size={8}>
-          <Typography align="left">{proxyFactory}</Typography>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Safe Singleton</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.safeSingleton}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Fallback Handler</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Module Setup</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.moduleSetup}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Module</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>ChainID</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{chainId}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>Proxy Creation Salt</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{proxyCreationSalt.toString()}</Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container size={12}>
+          <Grid size={4}>
+            <Typography>EOA nonce</Typography>
+          </Grid>
+          <Grid size={8}>
+            <Typography align="left">{nonce}</Typography>
+          </Grid>
         </Grid>
       </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Safe Singleton</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.safeSingleton}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Fallback Handler</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Module Setup</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.moduleSetup}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Module</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>ChainID</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{chainId}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>Proxy Creation Salt</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{proxyCreationSalt.toString()}</Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container>
-        <Grid size={4}>
-          <Typography>EOA nonce</Typography>
-        </Grid>
-        <Grid size={8}>
-          <Typography align="left">{nonce}</Typography>
-        </Grid>
-      </Grid>
-
-      {/* <TextField
-        label="Nonce"
-        type="number"
-        value={nonce}
-        onChange={(e) => setNonce(parseInt(e.target.value))}
-        fullWidth
-        margin="normal"
-      /> */}
 
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         Owners
@@ -443,7 +436,14 @@ function Delegate() {
         Convert to smart account {error ? "(Try again)" : null}
       </Button>
 
-      {transactionHash && <Typography align="center">Transaction hash: {transactionHash}</Typography>}
+      {transactionHash && (
+        <Typography align="center">
+          Transaction hash:{" "}
+          <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
+            {transactionHash}
+          </Link>
+        </Typography>
+      )}
 
       {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
         <Typography align="center">Waiting for transaction to confirm</Typography>
