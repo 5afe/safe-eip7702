@@ -409,6 +409,7 @@ function Delegate() {
         <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
           <Typography sx={{ color: "orange" }}>
             Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
+            EOA storage will not be initialized if it is already setup.
           </Typography>
         </Alert>
       ) : (
