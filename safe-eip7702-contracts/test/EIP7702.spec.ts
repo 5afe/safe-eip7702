@@ -70,9 +70,16 @@ describe("EIP7702", () => {
             const authNonce = BigInt(await delegatorSigningKey.getNonce());
 
             // Deploy SafeProxy with the delegator as owner
-            const owners = [await deployer.getAddress()];
+            const owners = [deployer];
+            const ownerAddresses = await Promise.all(owners.map(async (owner): Promise<string> => await owner.getAddress()));
             const fallbackHandlerAddress = await fallbackHandler.getAddress();
-            const data = getSetupData(owners, 1, await safeModuleSetup.getAddress(), [fallbackHandlerAddress], fallbackHandlerAddress);
+            const data = getSetupData(
+                ownerAddresses,
+                1,
+                await safeModuleSetup.getAddress(),
+                [fallbackHandlerAddress],
+                fallbackHandlerAddress,
+            );
 
             const proxyAddress = await calculateProxyAddress(safeEIP7702ProxyFactory, await safeSingleton.getAddress(), data, 0);
             const isContract = (await provider.getCode(proxyAddress)) === "0x" ? false : true;
@@ -84,14 +91,12 @@ describe("EIP7702", () => {
                 console.log("Proxy already deployed: ", proxyAddress);
             }
 
-            const authAddress = proxyAddress;
-
-            const authorizationList = getAuthorizationList(chainId, authNonce, pkDelegator, authAddress);
+            const authorizationList = getAuthorizationList(chainId, authNonce, pkDelegator, proxyAddress);
             const encodedSignedTx = await getSignedTransaction(provider, relayerSigningKey, authorizationList);
 
             const account = await delegator.getAddress();
 
-            const isAlreadyDelegated = await isAccountDelegatedToAddress(provider, await delegator.getAddress(), authAddress);
+            const isAlreadyDelegated = await isAccountDelegatedToAddress(provider, await delegator.getAddress(), proxyAddress);
             if (isAlreadyDelegated && (await provider.getStorage(account, 4)) == ethers.zeroPadValue("0x01", 32)) {
                 console.log("Account already delegated to Safe Proxy and storage is setup. Returning");
                 return;
@@ -105,9 +110,8 @@ describe("EIP7702", () => {
 
             expect(txReceipt?.status === 1, "Transaction failed");
 
-            console.log(await delegator.getAddress(), authAddress);
-            console.log(await provider.getCode(account));
-            expect(await isAccountDelegatedToAddress(provider, await delegator.getAddress(), authAddress)).to.be.true;
+            console.log("Account code:", await provider.getCode(account));
+            expect(await isAccountDelegatedToAddress(provider, await delegator.getAddress(), proxyAddress)).to.be.true;
 
             console.log("Account successfully delegated to Safe Proxy");
 
@@ -129,17 +133,17 @@ describe("EIP7702", () => {
             expect(await readModuleStorageSlot(provider, account, SENTINEL_ADDRESS)).to.equal(
                 ethers.zeroPadValue(fallbackHandlerAddress, 32),
             );
-            expect(await readOwnerStorageSlot(provider, account, SENTINEL_ADDRESS)).to.equal(ethers.zeroPadValue(owners[0], 32));
+            expect(await readOwnerStorageSlot(provider, account, SENTINEL_ADDRESS)).to.equal(ethers.zeroPadValue(ownerAddresses[0], 32));
 
-            const tx = await execTransaction(
-                relayer,
-                [deployer],
-                await getSafeAtAddress(account),
-                await deployer.getAddress(),
-                "1",
-                "0x",
-                "0",
-            );
+            const amount = 1n;
+            if ((await provider.getBalance(account)) < amount) {
+                const tx = await relayer.sendTransaction({
+                    to: account,
+                    value: amount,
+                });
+                await tx.wait();
+            }
+            const tx = await execTransaction(relayer, owners, await getSafeAtAddress(account), await deployer.getAddress(), "1", "0x", "0");
             console.log("Transfer value txHash", (await tx.wait())?.hash);
         });
 

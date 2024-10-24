@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { deployments, ethers } from "hardhat";
 import { isAccountDelegatedToAddress } from "../eip7702/storage";
-import { JsonRpcProvider, SigningKey } from "ethers";
+import { Provider, SigningKey } from "ethers";
 import { printAccountStorage } from "../utils/storageReader";
 import { getSetupData } from "../utils/safe";
 import { calculateProxyAddress, getAuthorizationList, getSignedTransaction } from "../eip7702/helper";
@@ -16,7 +16,7 @@ import {
 } from "../utils/setup";
 import { SafeEIP7702ProxyFactory } from "../../typechain-types";
 
-const setup = async (provider: JsonRpcProvider) => {
+const setup = async (provider: Provider) => {
     await deployments.fixture();
 
     const delegator = new ethers.Wallet(process.env.ACCOUNT_PRIVATE_KEY || "", provider);
@@ -41,18 +41,13 @@ const setup = async (provider: JsonRpcProvider) => {
 };
 
 const main = async () => {
-    const rpc = process.env.RPC_URL;
-
-    const provider = new ethers.JsonRpcProvider(rpc);
+    const provider = ethers.provider;
     const { safeSingleton, fallbackHandler, relayer, delegator, safeModuleSetup, safeEIP7702ProxyFactory } = await setup(provider);
-    const pkDelegator = process.env.PK3 || "";
-    const pkRelayer = process.env.PK2 || "";
-
-    const delegatorSigningKey = new ethers.Wallet(pkDelegator, provider);
-    const relayerSigningKey = new SigningKey(pkRelayer);
+    const pkDelegator = process.env.ACCOUNT_PRIVATE_KEY || "";
+    const relayerSigningKey = new SigningKey(process.env.RELAYER_PRIVATE_KEY || "");
 
     const chainId = (await provider.getNetwork()).chainId;
-    const authNonce = BigInt(await delegatorSigningKey.getNonce());
+    const authNonce = BigInt(await delegator.getNonce());
 
     // Deploy SafeProxy with the delegator as owner
     const owners = [delegator];

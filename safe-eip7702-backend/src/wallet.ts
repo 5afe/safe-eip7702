@@ -15,7 +15,7 @@ export const account = privateKeyToAccount(process.env.RELAYER_PRIVATE_KEY as `0
 
 const pectraDevnet = defineChain({
   id: 7042905162,
-  name: "pectra-devnet-3",
+  name: "pectra-devnet",
   nativeCurrency: {
     name: "Ethereum",
     symbol: "ETH",
@@ -32,12 +32,12 @@ const pectraDevnet = defineChain({
 const pectraWalletClient = createWalletClient({
   account,
   chain: pectraDevnet,
-  transport: http(),
+  transport: http(process.env.RPC_URL_PECTRA),
 }).extend(eip7702Actions());
 
 const pectraPublicClient = createPublicClient({
   chain: pectraDevnet,
-  transport: http(),
+  transport: http(process.env.RPC_URL_PECTRA),
 });
 
 const customChain = defineChain({
@@ -85,5 +85,10 @@ export const getPublicClient = (chainId: number): PublicClient => {
 export const getAccount = (chainId: number): Account => account;
 
 export const getChain = (chainId: number): Chain => {
-  return customChain;
+  if (chainId == (process.env.NETWORK_ID as unknown as number)) {
+    return customChain;
+  } else if (chainId == pectraDevnet.id) {
+    return pectraDevnet;
+  }
+  throw new Error(`Unsupported chainId: [${chainId}]. No chain information available.`);
 };

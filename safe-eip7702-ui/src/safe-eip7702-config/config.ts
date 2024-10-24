@@ -1,7 +1,7 @@
 export const safeEIP7702Config: any = {
   7042905162: {
     rpc: import.meta.env.VITE_PECTRA_RPC_URL,
-    name: "pectra-devnet-4",
+    name: "pectra-devnet",
     addresses: {
       proxyFactory: "0xE60EcE6588DCcFb7373538034963B4D20a280DB0",
       safeSingleton: "0xCfaA26AD40bFC7E3b1642E1888620FC402b95dAB",
