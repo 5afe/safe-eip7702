@@ -11,7 +11,7 @@ export const safeEIP7702Config: any = {
       multiSendCallOnly: "0x4873593fC8e788eFc06287327749fdDe08C0146b"
     }
   },    
-  [import.meta.env.VITE_NETWORK_ID || "" ]: {
+  [parseInt(import.meta.env.VITE_NETWORK_ID) || "" ]: {
     rpc: import.meta.env.VITE_RPC_URL,
     name: import.meta.env.VITE_NETWORK_NAME,
     addresses: {
@@ -25,4 +25,4 @@ export const safeEIP7702Config: any = {
   }
 };
 
-export const defaultChainId = import.meta.env.VITE_DEFAULT_CHAIN_ID;
+export const defaultChainId = parseInt(import.meta.env.VITE_DEFAULT_CHAIN_ID);

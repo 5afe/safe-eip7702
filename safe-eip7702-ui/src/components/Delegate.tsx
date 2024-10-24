@@ -10,7 +10,6 @@ import {
   isAddressEqual,
   zeroAddress,
 } from "viem";
-import { config } from "../wagmi";
 import { WalletContext } from "../context/WalletContext";
 import { safeEIP7702Config } from "../safe-eip7702-config/config";
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
@@ -25,17 +24,16 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Box
+  Box,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import { eip7702Actions } from "viem/experimental";
 import { getProxyAddress, getShortAddress } from "../utils/utils";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 
 declare global {
   interface BigInt {
@@ -66,12 +64,12 @@ function Delegate() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [canSign, setCanSign] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
   useEffect(() => {
     const newInitData = calculateInitData() as `0x${string}`;
-    console.log("Calculating init data. Is new data defined? ", newInitData === undefined);
     setInitData(newInitData);
   }, [threshold, owners]);
 
@@ -86,7 +84,6 @@ function Delegate() {
   useEffect(() => {
     if (proxyAddress) {
       (async () => {
-        console.log("checking proxy code");
         const proxyCode = await publicClient.getCode({ address: proxyAddress });
         if (proxyCode) {
           setIsProxyDeployed(true);
@@ -171,6 +168,8 @@ function Delegate() {
 
   const handleConvertToSmartAccount = async () => {
     setError(undefined);
+    setSuccess(false);
+
     if (!authorizations.length) {
       setErrorMessage("Authorization not signed");
       return;
@@ -186,10 +185,20 @@ function Delegate() {
     if (result.txHash) {
       setTransactionHash(result.txHash);
       setIsWaitingForTransactionReceipt(true);
-      await waitForTransactionReceipt(config, {
-        hash: result.txHash,
-        pollingInterval: import.meta.env.VITE_TRANSACTION_POOLING_INTERVAL || 12_000,
+
+      const publicClient = createPublicClient({
+        transport: http(safeEIP7702Config[chainId].rpc),
       });
+
+      try {
+        await publicClient.waitForTransactionReceipt({
+          hash: result.txHash,
+          pollingInterval: parseInt(import.meta.env.VITE_TRANSACTION_POOLING_INTERVAL) || 12_000,
+        });
+        setSuccess(true);
+      } catch (e) {
+        setError("Failed to execute transaction");
+      }
       setIsWaitingForTransactionReceipt(false);
     } else {
       setError("Failed to relay authorization");
@@ -217,6 +226,7 @@ function Delegate() {
 
       setAuthorizations([authorization]);
       setSigned(true);
+      setSuccess(false);
     }
   };
 
@@ -252,7 +262,7 @@ function Delegate() {
         Delegation Config
       </Typography>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Proxy Factory</Typography>
         </Grid>
@@ -261,7 +271,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Safe Singleton</Typography>
         </Grid>
@@ -270,7 +280,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Fallback Handler</Typography>
         </Grid>
@@ -279,7 +289,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Module Setup</Typography>
         </Grid>
@@ -288,7 +298,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Module</Typography>
         </Grid>
@@ -297,7 +307,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>ChainID</Typography>
         </Grid>
@@ -306,7 +316,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>Proxy Creation Salt</Typography>
         </Grid>
@@ -315,7 +325,7 @@ function Delegate() {
         </Grid>
       </Grid>
 
-      <Grid container >
+      <Grid container>
         <Grid size={4}>
           <Typography>EOA nonce</Typography>
         </Grid>
@@ -323,7 +333,6 @@ function Delegate() {
           <Typography align="left">{nonce}</Typography>
         </Grid>
       </Grid>
-
 
       {/* <TextField
         label="Nonce"
@@ -344,7 +353,7 @@ function Delegate() {
             <Grid size={10}>
               <TextField
                 fullWidth
-                label={`Signer ${index + 1} ${(account?.address && isAddress(owner) && isAddressEqual(owner as `0x${string}`, account?.address)) ? "(Connected EOA address)" : ""}`}
+                label={`Signer ${index + 1} ${account?.address && isAddress(owner) && isAddressEqual(owner as `0x${string}`, account?.address) ? "(Connected EOA address)" : ""}`}
                 value={owner}
                 onChange={(e) => handleOwnerChange(index, e.target.value)}
                 placeholder="Enter singer address"
@@ -353,7 +362,6 @@ function Delegate() {
                 helperText={
                   (!isAddress(owner) && "Invalid address") ||
                   (owners.indexOf(owner) !== owners.lastIndexOf(owner) && "Duplicate singer address")
-
                 }
               />
             </Grid>
@@ -370,13 +378,17 @@ function Delegate() {
         Add Signer
       </Button>
 
-      <Typography variant="h4"  sx={{ marginTop: 3 }}>Threshold</Typography>
+      <Typography variant="h4" sx={{ marginTop: 3 }}>
+        Threshold
+      </Typography>
 
       <Grid container>
         <Grid>
-          <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: '1px solid #ced4da' }}>
+          <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: "1px solid #ced4da" }}>
             {owners.map((owner, index) => (
-              <MenuItem key={owner} value={index + 1}>{index + 1}</MenuItem>
+              <MenuItem key={owner} value={index + 1}>
+                {index + 1}
+              </MenuItem>
             ))}
           </Select>
         </Grid>
@@ -386,7 +398,6 @@ function Delegate() {
 
       {proxyAddress ? (
         <div>
-
           {isProxyDeployed ? (
             <Alert>
               <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
@@ -394,25 +405,19 @@ function Delegate() {
           ) : (
             <Alert severity="info" sx={{ marginTop: 2 }}>
               <Typography color="primary">
-                Proxy  {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
+                Proxy {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
               </Typography>
             </Alert>
           )}
         </div>
       ) : null}
 
-
-
       {delegatee ? (
-          <Alert
-            severity="warning"
-            sx={{ marginTop: 2 }}
-            action={<Link to={"/settings"}>View storage</Link>}
-          >
-            <Typography sx={{ color: "orange" }}>
-              Account already delegated to address: {getShortAddress("0x" + delegatee.slice(8) as `0x${string}`)}.
-            </Typography>
-          </Alert>
+        <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
+          <Typography sx={{ color: "orange" }}>
+            Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
+          </Typography>
+        </Alert>
       ) : (
         <Typography align="center">Account not delegated</Typography>
       )}
@@ -444,10 +449,20 @@ function Delegate() {
         <Typography align="center">Waiting for transaction to confirm</Typography>
       ) : null}
 
-      {loading && <Grid container justifyContent="center"><CircularProgress /> </Grid> }
+      {loading && (
+        <Grid container justifyContent="center">
+          <CircularProgress />
+        </Grid>
+      )}
       {error && (
-        <Alert severity="error" sx={{ bgcolor: "background.paper" }}>
+        <Alert severity="error">
           <Typography sx={{ color: "red" }}>{error}</Typography>
+        </Alert>
+      )}
+
+      {success && !error && (
+        <Alert severity="success">
+          <Typography sx={{ color: "green" }}>Transaction executed</Typography>
         </Alert>
       )}
     </Box>

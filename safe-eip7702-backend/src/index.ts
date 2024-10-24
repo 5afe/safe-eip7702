@@ -34,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/", async (req: Request, res: Response) => {
   const { initData, authorizationList, from } = req.body;
   const chainId = authorizationList[0].chainId as number;
+
   const proxyAddress = authorizationList[0].contractAddress as `0x${string}`;
   const addresses = safeEIP7702Addresses[chainId];
 
@@ -56,7 +57,7 @@ app.post("/", async (req: Request, res: Response) => {
 
     // Check if proxy is already deployed
     if (await publicClient.getCode({ address: proxyAddress })) {
-      console.log("Proxy already deployed");
+      console.log(`Proxy already deployed [${proxyAddress}]`);
     } else {
       console.log(`Adding transaction to deploy proxy [${proxyAddress}]`);
       // Transaction to deploy proxy with initData
