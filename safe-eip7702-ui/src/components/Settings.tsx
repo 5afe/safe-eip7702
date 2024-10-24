@@ -27,6 +27,7 @@ const Settings: React.FC = () => {
     if (!account || !isAddress(accountAddress)) return;
     setLoading(true);
     const storage = await readStorage(publicClient, accountAddress);
+    console.log(`Storage values for account [${accountAddress}]:`, storage);
     const accountCode = await publicClient.getCode({ address: accountAddress });
 
     if (accountCode && accountCode.startsWith(ACCOUNT_CODE_PREFIX)) {
@@ -50,9 +51,11 @@ const Settings: React.FC = () => {
         const modules = modulesResult[0].map((module: string) => module);
         setModules(modules);
       }
+    } else {
+      setIsDelegatedToSafeSingleton(false);
+      setOwners(undefined);
+      setModules(undefined);
     }
-
-    console.log("Read storage", storage);
 
     setAccountCode(accountCode);
     setSafeStorage(storage);
