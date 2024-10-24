@@ -26,7 +26,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [account, setAccount] = useState<PrivateKeyAccount>(privateKeyToAccount(import.meta.env.VITE_PRIVATE_KEY));
   const [authorizations, setAuthorizations] = useState<Authorization[]>([]);
   const [chainId, setChainId] = useState<number>(defaultChainId);
-
   // Function to validate the private key
   const validatePrivateKey = (key: `0x${string}` | undefined) => {
     console.log('Validating private key');
