@@ -1,66 +1,88 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.26;
+
+import {PackedUserOperation} from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 
 /**
  * @title SafeLite - A lite version of Safe with multi-send functionality. The contract uses only storage slot 0 to track nonce.
  *                   The contract is intended to be used with EIP-7702 where EOA delegates to this contract.
  */
 contract SafeLite {
-    address private immutable MULTISEND_SINGLETON;
-    address private immutable FALLBACK_HANDLER;
-    uint256 public nonce;
+    struct Storage {
+        uint256 nonce;
+    }
 
-    // Custom error types
-    error OnlyDelegateCall();
-    error InvalidNonce();
+    // keccak256("SafeLite") & (~0xff)
+    bytes32 private constant _STORAGE = 0xf391af0813284e31898752ae6d86b2fba2f5b7957123c9689e204dd75b30e800;
+    // keccak256("EIP712Domain(uint256 chainId,address verifyingContract)");
+    bytes32 private constant _DOMAIN_TYPEHASH = 0x47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218;
+    // keccak256("MultiSend(bytes32 data,uint256 nonce)")
+    bytes32 private constant _MULTISEND_TYPEHASH = 0x4b62daad5ffa0b659a63c2970c5ece817f1135bfe9848c40eedd738724987890;
+
+    address private immutable ENTRY_POINT;
+
     error InvalidSignature();
-    error InvalidSignatureLength();
+    error UnsupportedEntryPoint();
 
     // EIP-712 Domain separator and type hash for the struct
     bytes32 public constant DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-    bytes32 public constant MULTISEND_TYPEHASH = keccak256("MultiSend(bytes32 data,uint256 nonce)");
 
-    constructor(address fallbackHandler) {
-        MULTISEND_SINGLETON = address(this);
-        FALLBACK_HANDLER = fallbackHandler;
+    constructor(address entryPoint) {
+        ENTRY_POINT = entryPoint;
+    }
+
+    /**
+     * @notice Validates the call is initiated by the entry point.
+     */
+    modifier onlySupportedEntryPoint() {
+        if (msg.sender != ENTRY_POINT) {
+            revert UnsupportedEntryPoint();
+        }
+        _;
+    }
+
+    function validateUserOp(
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        uint256 missingAccountFunds
+    ) external onlySupportedEntryPoint returns (uint256 validationData) {
+        (uint256 r, uint256 vs) = abi.decode(userOp.signature, (uint256, uint256));
+        bool ok = _isValidSignature(userOpHash, r, vs);
+
+        assembly ("memory-safe") {
+            validationData := add(not(ok), 2) // branchless madnesss, good thing this isn't production code!
+            if missingAccountFunds {
+                pop(call(gas(), caller(), missingAccountFunds, 0, 0, 0, 0))
+            }
+        }
     }
 
     /**
      * @dev Sends multiple transactions with signature validation and reverts all if one fails.
      * @param transactions Encoded transactions.
-     * @param signature The signature to validate.
-     * @param _nonce The unique nonce to ensure transaction uniqueness.
+     * @param r The r part of the signature.
+     * @param vs The v and s part of the signature.
      */
-    function multiSend(bytes memory transactions, bytes memory signature, uint256 _nonce) public payable {
-        if (address(this) == MULTISEND_SINGLETON) {
-            revert OnlyDelegateCall();
-        }
-
-        // Ensure correct nonce is used
-        if (_nonce != nonce) {
-            revert InvalidNonce();
-        }
-
-        bytes32 DOMAIN_SEPARATOR = keccak256(
-            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes("SafeLite")), keccak256(bytes("1")), block.chainid, address(this))
-        );
+    function multiSend(bytes memory transactions, uint256 r, uint256 vs) public payable {
+        Storage storage $ = _storage();
+        uint256 nonce = $.nonce;
 
         // Calculate the hash of transactions data and nonce for signature verification
-        bytes32 structHash = keccak256(abi.encode(MULTISEND_TYPEHASH, keccak256(transactions), nonce));
-        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+        bytes32 domainSeparator = keccak256(abi.encode(DOMAIN_TYPEHASH, block.chainid, address(this)));
+        bytes32 structHash = keccak256(abi.encode(_MULTISEND_TYPEHASH, keccak256(transactions), nonce));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
 
         // Verify the signature
-        address signer = recoverSigner(digest, signature);
-        if (signer != address(this)) {
-            revert InvalidSignature();
-        }
+        require(_isValidSignature(digest, r, vs), InvalidSignature());
 
         // Update nonce for the sender to prevent replay attacks
-        nonce++;
+        unchecked {
+            $.nonce = nonce + 1;
+        }
 
         /* solhint-disable no-inline-assembly */
-        assembly {
+        assembly ("memory-safe") {
             let length := mload(transactions)
             let i := 0x20
             for {
@@ -70,7 +92,6 @@ contract SafeLite {
             } {
                 let operation := shr(0xf8, mload(add(transactions, i)))
                 let to := shr(0x60, mload(add(transactions, add(i, 0x01))))
-                to := or(to, mul(iszero(to), address()))
                 let value := mload(add(transactions, add(i, 0x15)))
                 let dataLength := mload(add(transactions, add(i, 0x35)))
                 let data := add(transactions, add(i, 0x55))
@@ -96,79 +117,28 @@ contract SafeLite {
      * @dev ERC-1271: Validates if the provided signature is valid for the given hash.
      * @param hash The hash of the signed data.
      * @param signature The signature to validate.
-     * @return The ERC-1271 magic value (0x1626ba7e) if the signature is valid, 0xffffffff otherwise.
+     * @return magicValue The ERC-1271 magic value (0x1626ba7e) if the signature is valid, 0x00000000 otherwise.
      */
-    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
-        // Verify if the signature corresponds to the hash signed by the contract itself
-        address signer = recoverSigner(hash, signature);
-        if (signer == address(this)) {
-            return 0x1626ba7e;
-        } else {
-            return 0x00000000;
+    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4 magicValue) {
+        (uint256 r, uint256 vs) = abi.decode(signature, (uint256, uint256));
+        bool ok = _isValidSignature(hash, r, vs);
+
+        assembly ("memory-safe") {
+            magicValue := mul(ok, 0x1626ba7e)
         }
     }
 
-    /**
-     * @dev Recover the signer from the signature.
-     * @param hash The hash of the signed data.
-     * @param signature The signature to recover the signer from.
-     */
-    function recoverSigner(bytes32 hash, bytes memory signature) internal pure returns (address) {
-        if (signature.length != 65) {
-            revert InvalidSignatureLength();
+    function _isValidSignature(bytes32 hash, uint256 r, uint256 vs) internal view returns (bool) {
+        unchecked {
+            uint256 v = (vs >> 255) + 27;
+            uint256 s = vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+            return address(this) == ecrecover(hash, uint8(v), bytes32(r), bytes32(s));
         }
-
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-
-        // Divide the signature into r, s and v variables
-        assembly {
-            r := mload(add(signature, 0x20))
-            s := mload(add(signature, 0x40))
-            v := byte(0, mload(add(signature, 0x60)))
-        }
-
-        // Recover the signer address
-        return ecrecover(hash, v, r, s);
     }
 
-    // @notice Forwards all calls to the fallback handler if set. Returns 0 if no handler is set.
-    // @dev Appends the non-padded caller address to the calldata to be optionally used in the handler
-    //      The handler can make us of `HandlerContext.sol` to extract the address.
-    //      This is done because in the next call frame the `msg.sender` will be FallbackManager's address
-    //      and having the original caller address may enable additional verification scenarios.
-    // solhint-disable-next-line payable-fallback,no-complex-fallback
-    fallback() external {
-        address handler = FALLBACK_HANDLER;
-        /* solhint-disable no-inline-assembly */
-        /// @solidity memory-safe-assembly
-        assembly {
-            // When compiled with the optimizer, the compiler relies on a certain assumptions on how the
-            // memory is used, therefore we need to guarantee memory safety (keeping the free memory point 0x40 slot intact,
-            // not going beyond the scratch space, etc)
-            // Solidity docs: https://docs.soliditylang.org/en/latest/assembly.html#memory-safety
-
-            if iszero(handler) {
-                return(0, 0)
-            }
-
-            let ptr := mload(0x40)
-            calldatacopy(ptr, 0, calldatasize())
-
-            // The msg.sender address is shifted to the left by 12 bytes to remove the padding
-            // Then the address without padding is stored right after the calldata
-            mstore(add(ptr, calldatasize()), shl(96, caller()))
-
-            // Add 20 bytes for the address appended add the end
-            let success := call(gas(), handler, 0, ptr, add(calldatasize(), 20), 0, 0)
-
-            returndatacopy(ptr, 0, returndatasize())
-            if iszero(success) {
-                revert(ptr, returndatasize())
-            }
-            return(ptr, returndatasize())
+    function _storage() private pure returns (Storage storage $) {
+        assembly ("memory-safe") {
+            $.slot := _STORAGE
         }
-        /* solhint-enable no-inline-assembly */
     }
 }

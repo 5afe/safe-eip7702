@@ -96,4 +96,4 @@ sequenceDiagram
 
 ### Useful links
 
-- [Pectra Faucet](https://faucet.pectra-devnet-3.ethpandaops.io/)
+- [Pectra Faucet](https://faucet.pectra-4.ethpandaops.io/)

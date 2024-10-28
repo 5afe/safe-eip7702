@@ -115,6 +115,14 @@ function Delegate() {
     }
   });
 
+  const walletClient = createWalletClient({
+    transport: http(safeEIP7702Config[chainId].rpc),
+  }).extend(eip7702Actions());
+
+  const publicClient = createPublicClient({
+    transport: http(safeEIP7702Config[chainId].rpc),
+  });
+
   const validateOwners = (): boolean => {
     const uniqueOwners = new Set(owners);
     return uniqueOwners.size === owners.length && owners.every((owner) => isAddress(owner));
@@ -185,18 +193,21 @@ function Delegate() {
     if (result.txHash) {
       setTransactionHash(result.txHash);
       setIsWaitingForTransactionReceipt(true);
-
-      const publicClient = createPublicClient({
-        transport: http(safeEIP7702Config[chainId].rpc),
-      });
-
       try {
-        await publicClient.waitForTransactionReceipt({
+        const transactionReceipt = await publicClient.waitForTransactionReceipt({
           hash: result.txHash,
           pollingInterval: parseInt(import.meta.env.VITE_TRANSACTION_POOLING_INTERVAL) || 12_000,
         });
-        setSuccess(true);
+        console.log("Transaction receipt", transactionReceipt);
+
+        if (transactionReceipt.status === "success") {
+          setSuccess(true);
+        } else {
+          setError("Transaction failed");
+          setSuccess(false);
+        }
       } catch (e) {
+        console.error("Failed to execute transaction", e);
         setError("Failed to execute transaction");
       }
       setIsWaitingForTransactionReceipt(false);
@@ -206,14 +217,6 @@ function Delegate() {
     }
     setLoading(false);
   };
-
-  const walletClient = createWalletClient({
-    transport: http(safeEIP7702Config[chainId].rpc),
-  }).extend(eip7702Actions());
-
-  const publicClient = createPublicClient({
-    transport: http(safeEIP7702Config[chainId].rpc),
-  });
 
   const handleSignAuthorization = async (chainId: number) => {
     if (account && proxyAddress) {
