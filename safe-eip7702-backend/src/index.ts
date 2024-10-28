@@ -10,6 +10,8 @@ import { MultiSendABI } from "./utils";
 import { encodeMultiSend, MetaTransaction } from "./multisend";
 import SafeEIP7702ProxyFactoryArtifact from "./artifacts/SafeEIP7702ProxyFactory.json";
 
+const TX_GAS = process.env.TX_GAS || 1_000_000;
+
 declare global {
   interface BigInt {
     toJSON(): Number;
@@ -92,23 +94,29 @@ app.post("/", async (req: Request, res: Response) => {
     if (transactions.length > 0) {
       // Encode all transactions into a single byte string for multiSend
       const encodedTransactions = encodeMultiSend(transactions);
+
       const data = encodeFunctionData({ abi: MultiSendABI, functionName: "multiSend", args: [encodedTransactions] });
 
       const walletClient = await getWalletClient(chainId);
-      console.log(`Sending transaction on chain [${chainId}]`);
-      // Send the multiSend transaction
-      txHash = await walletClient.sendTransaction({
+     
+      const request = await walletClient.prepareTransactionRequest({
         chain: getChain(chainId),
         account: getAccount(chainId),
         to: addresses.multiSendCallOnly, // The address of the MultiSendCallOnly contract
         data: data, // MultiSend call
         value: BigInt(0), // Value sent with the transaction
         authorizationList,
-        gasLimit: BigInt(10_000_000), // Gas limit
-      });
+        gas: BigInt(TX_GAS),
+      })
+
+      console.log(`Sending transaction on chain [${chainId}] for EOA [${from}]`, request);
+      const serializedTransaction = await walletClient.signTransaction(request)
+      // Send the multiSend transaction
+      txHash = await walletClient.sendRawTransaction({ serializedTransaction });
+      
     } else {
       const walletClient = await getWalletClient(chainId);
-      console.log(`Sending only authorization transaction on chain [${chainId}]`);
+      console.log(`Sending only authorization transaction on chain [${chainId}] for EOA [${from}]`);
       txHash = await walletClient.sendTransaction({
         account: getAccount(chainId),
         chain: getChain(chainId),
@@ -116,6 +124,7 @@ app.post("/", async (req: Request, res: Response) => {
         data: "0x",
         value: BigInt(0),
         authorizationList,
+        gas: BigInt(TX_GAS),
       });
     }
 
