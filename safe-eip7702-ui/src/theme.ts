@@ -30,6 +30,7 @@ const retroTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 0, // Sharp edges for the retro button
+          fontWeight: 'bold', // Set bold text for all button variants
         },
         contained: {
           color: "#000000", // Change button text color to black
