@@ -28,7 +28,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [chainId, setChainId] = useState<number>(defaultChainId);
   // Function to validate the private key
   const validatePrivateKey = (key: `0x${string}` | undefined) => {
-    console.log('Validating private key');
     if (key && key.startsWith('0x') && isHex(key) && key.length === 66) {
       setIsPrivateKeyValid(true);
       setAccount(privateKeyToAccount(key));
