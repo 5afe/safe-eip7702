@@ -25,6 +25,7 @@ import {
   Select,
   SelectChangeEvent,
   Box,
+  Tooltip,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { eip7702Actions } from "viem/experimental";
@@ -34,6 +35,8 @@ import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
 import AddIcon from "@mui/icons-material/Add";
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import DefaultConfigurationDialog from "./dialogs/DefaultConfigurationDialog";
 
 declare global {
   interface BigInt {
@@ -65,6 +68,7 @@ function Delegate() {
   const [error, setError] = useState<string>();
   const [canSign, setCanSign] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
@@ -255,89 +259,19 @@ function Delegate() {
     }
   };
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <Box>
       <Typography variant="h3" align="left">
         EIP-7702 Delegate Setup
       </Typography>
-
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
-        Delegation Config
-      </Typography>
-
-      <Grid container size={12}>
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Proxy Factory</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{proxyFactory}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Safe Singleton</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.safeSingleton}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Fallback Handler</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Module Setup</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.moduleSetup}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Module</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>ChainID</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{chainId}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Proxy Creation Salt</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{proxyCreationSalt.toString()}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>EOA nonce</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{nonce}</Typography>
-          </Grid>
-        </Grid>
-      </Grid>
 
       <Typography variant="h4" sx={{ marginTop: 2 }}>
         Owners
@@ -389,6 +323,32 @@ function Delegate() {
           </Select>
         </Grid>
       </Grid>
+
+      <Grid container sx={{ marginTop: "2vh", marginBottom: "2vh" }} onClick={handleOpenDialog}>
+        <Grid>
+          <Typography sx={{ textDecoration: 'underline', color: 'grey' }}
+          >
+            View other default configuration
+          </Typography>
+        </Grid>
+        <Grid sx={{ marginLeft: "10px" }}>
+          <Tooltip title="Click to view the default configuration details such as contract addresses, chainId and nonce">
+            <InfoOutlined sx={{ color: "grey" }} />
+          </Tooltip>
+        </Grid>
+      </Grid>
+
+      <DefaultConfigurationDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        proxyFactory={proxyFactory || ""}
+        safeSingleton={safeEIP7702Config[chainId]?.addresses.safeSingleton || ""}
+        fallbackHandler={safeEIP7702Config[chainId]?.addresses.fallbackHandler || ""}
+        moduleSetup={safeEIP7702Config[chainId]?.addresses.moduleSetup || ""}
+        chainId={chainId || 0}
+        proxyCreationSalt={proxyCreationSalt}
+        nonce={nonce}
+      />
 
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}
 

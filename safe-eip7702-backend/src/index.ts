@@ -104,6 +104,7 @@ app.post("/", async (req: Request, res: Response) => {
         data: data, // MultiSend call
         value: BigInt(0), // Value sent with the transaction
         authorizationList,
+        gasLimit: BigInt(10_000_000), // Gas limit
       });
     } else {
       const walletClient = await getWalletClient(chainId);
