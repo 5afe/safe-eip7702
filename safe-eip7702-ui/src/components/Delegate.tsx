@@ -79,12 +79,12 @@ function Delegate() {
   }, [threshold, owners]);
 
   useEffect(() => {
-    if (!proxyAddress || isWaitingForTransactionHash || isWaitingForTransactionReceipt) {
-      setCanSign(true);
-    } else {
+    if (proxyAddress === undefined || isWaitingForTransactionHash || isWaitingForTransactionReceipt || authorizations.length > 0 || delegatee !== undefined) {
       setCanSign(false);
+    } else {
+      setCanSign(true);
     }
-  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt]);
+  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt, authorizations]);
 
   useEffect(() => {
     if (proxyAddress) {
@@ -304,6 +304,11 @@ function Delegate() {
                   (!isAddress(owner) && "Invalid address") ||
                   (owners.indexOf(owner) !== owners.lastIndexOf(owner) && "Duplicate singer address")
                 }
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontFamily: 'monospace',
+                  },
+                }}
               />
             </Grid>
             <Grid size={2}>
@@ -361,16 +366,16 @@ function Delegate() {
 
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}
 
-      {proxyAddress ? (
+      {proxyAddress && delegatee === undefined ? (
         <div>
           {isProxyDeployed ? (
             <Alert>
-              <Typography>Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
+              <Typography>Proxy <Typography component="code" sx={{ fontFamily: 'monospace' }}>{getShortAddress(proxyAddress)}</Typography> already deployed</Typography>
             </Alert>
           ) : (
             <Alert severity="info" sx={{ marginTop: 2 }}>
               <Typography>
-                Relayer will deploy proxy at address {getShortAddress(proxyAddress)}
+                Relayer will deploy proxy at address: <Typography component="code" sx={{ fontFamily: 'monospace' }}>{getShortAddress(proxyAddress)}</Typography>
               </Typography>
             </Alert>
           )}
@@ -378,16 +383,17 @@ function Delegate() {
       ) : null}
 
       {delegatee && (
-        <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
+        <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View more</Link>}>
           <Typography>
-            Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
-            EOA storage will not be initialized if it is already setup.
+            Account already delegated to address: <Typography component="code" sx={{ fontFamily: 'monospace' }}>
+              {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}
+            </Typography>
           </Typography>
         </Alert>
       )}
       <Button
         variant="contained"
-        disabled={canSign || authorizations.length > 0}
+        disabled={!canSign}
         onClick={() => handleSignAuthorization(chainId)}
         sx={{ marginTop: 2 }}
         fullWidth
