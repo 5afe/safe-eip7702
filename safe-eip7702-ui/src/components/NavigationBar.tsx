@@ -58,13 +58,13 @@ const NavigationBar: React.FC = () => {
   }, [chainId]);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#000", borderBottom: "2px solid rgb(18, 255, 128)" }}>
+    <AppBar position="static" sx={{ borderBottom: "2px solid rgb(18, 255, 128)" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left Section: App Name and Buttons */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography
             variant="h6"
-            sx={{ color: "rgb(18, 255, 128)", fontFamily: '"Press Start 2P", monospace', marginRight: 4 }}
+            sx={{ marginRight: 4 }}
           >
             EOA--&gt;Safe
           </Typography>

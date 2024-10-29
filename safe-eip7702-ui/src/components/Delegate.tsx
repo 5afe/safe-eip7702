@@ -26,10 +26,11 @@ import {
   SelectChangeEvent,
   Box,
   Tooltip,
+  Dialog,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { eip7702Actions } from "viem/experimental";
-import { getProxyAddress, getShortAddress } from "../utils/utils";
+import { getProxyAddress, getShortAddress, getShortTransactionHash } from "../utils/utils";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
@@ -69,6 +70,7 @@ function Delegate() {
   const [canSign, setCanSign] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openDialogTransactionStatus, setOpenDialogTransactionStatus] = useState<boolean>(false);
 
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
@@ -179,6 +181,7 @@ function Delegate() {
   };
 
   const handleConvertToSmartAccount = async () => {
+    setOpenDialogTransactionStatus(true);
     setError(undefined);
     setSuccess(false);
 
@@ -356,11 +359,11 @@ function Delegate() {
         <div>
           {isProxyDeployed ? (
             <Alert>
-              <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
+              <Typography>Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
             </Alert>
           ) : (
             <Alert severity="info" sx={{ marginTop: 2 }}>
-              <Typography color="primary">
+              <Typography>
                 Proxy {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
               </Typography>
             </Alert>
@@ -370,7 +373,7 @@ function Delegate() {
 
       {delegatee ? (
         <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
-          <Typography sx={{ color: "orange" }}>
+          <Typography>
             Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
             EOA storage will not be initialized if it is already setup.
           </Typography>
@@ -400,35 +403,60 @@ function Delegate() {
         Convert to smart account {error ? "(Try again)" : null}
       </Button>
 
-      {transactionHash && (
-        <Typography align="center">
-          Transaction hash:{" "}
-          <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
-            {transactionHash}
-          </Link>
-        </Typography>
-      )}
 
-      {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
-        <Typography align="center">Waiting for transaction to confirm</Typography>
-      ) : null}
+      <Dialog open={openDialogTransactionStatus} onClose={() => setOpenDialogTransactionStatus(false)}>
+        <Box sx={{ padding: 2 }}>
+          {transactionHash && (
+            <Typography align="center">
+              Transaction hash:&nbsp;
+              <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
+                {getShortTransactionHash(transactionHash)}
+              </Link>
+            </Typography>
+          )}
 
-      {loading && (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      )}
+          {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
+            <Typography align="center">Waiting for transaction to confirm</Typography>
+          ) : null}
+
+          {loading && (
+            <Grid container justifyContent="center">
+              <CircularProgress />
+            </Grid>
+          )}
+          {error && (
+            <Alert severity="error">
+              <Typography sx={{ color: "red" }}>{error}</Typography>
+            </Alert>
+          )}
+
+          {success && !error && (
+            <Grid container justifyContent="center" alignItems="center" size={12} sx={{marginTop: "2vh"}}>
+              <Grid size={12} justifyContent="center" alignItems="center">
+                <Button
+                fullWidth
+                  variant="contained"
+                  onClick={() => window.open(`${import.meta.env.VITE_SAFE_UI_URL}/home?safe=${account?.address}`, '_blank')}
+                >
+                  Go to Safe Wallet
+                </Button>
+              </Grid>
+              <Grid size={12}>
+                <Alert severity="success">
+                  <Typography sx={{ color: "white" }}>Transaction executed</Typography>
+                </Alert>
+              </Grid>
+            </Grid>
+          )}
+        </Box>
+      </Dialog>
+
       {error && (
         <Alert severity="error">
           <Typography sx={{ color: "red" }}>{error}</Typography>
         </Alert>
       )}
 
-      {success && !error && (
-        <Alert severity="success">
-          <Typography sx={{ color: "green" }}>Transaction executed</Typography>
-        </Alert>
-      )}
     </Box>
   );
 }
