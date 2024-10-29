@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { Container, CssBaseline } from '@mui/material';
 import Delegate from './components/Delegate';
 import Settings from './components/Settings';
-import Home from './components/Home';
+import Home from './components/home/Home';
 import { WalletProvider } from './context/WalletContext';
 import NavigationBar from './components/NavigationBar';
 import SafeThemeProvider from './theme/SafeThemeProvider';

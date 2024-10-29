@@ -75,8 +75,7 @@ function Delegate() {
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
   useEffect(() => {
-    const newInitData = calculateInitData() as `0x${string}`;
-    setInitData(newInitData);
+    setInitData(calculateInitData() as `0x${string}`);
   }, [threshold, owners]);
 
   useEffect(() => {
@@ -107,19 +106,28 @@ function Delegate() {
   useEffect(() => {
     if (account) {
       (async () => {
-        const publicClient = createPublicClient({
-          transport: http(safeEIP7702Config[chainId].rpc),
-        });
 
-        const transactionCount = await publicClient.getTransactionCount({
-          address: account.address,
-        });
-        setNonce(transactionCount);
+        setOwners([account?.address]);
+        setThreshold(1);
+        setInitData(calculateInitData() as `0x${string}`);
 
-        setDelegatee(await publicClient.getCode({ address: account.address }));
+        try {
+          const publicClient = createPublicClient({
+            transport: http(safeEIP7702Config[chainId].rpc),
+          });
+
+          const transactionCount = await publicClient.getTransactionCount({
+            address: account.address,
+          });
+          setNonce(transactionCount);
+
+          setDelegatee(await publicClient.getCode({ address: account.address }));
+        } catch (e) {
+          console.error("RPC error", e);
+        }
       })();
     }
-  });
+  }, [account]);
 
   const walletClient = createWalletClient({
     transport: http(safeEIP7702Config[chainId].rpc),
@@ -272,11 +280,11 @@ function Delegate() {
 
   return (
     <Box>
-      <Typography variant="h3" align="left">
-        EIP-7702 Delegate Setup
+      <Typography variant="h1" align="left" fontSize={[44, null, 52]} sx={{ marginTop: 5 }}>
+        Account Setup
       </Typography>
 
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
+      <Typography fontSize={[20, null, 20]} sx={{ marginTop: 2 }}>
         Owners
       </Typography>
 
@@ -311,20 +319,18 @@ function Delegate() {
         Add Signer
       </Button>
 
-      <Typography variant="h4" sx={{ marginTop: 3 }}>
+      <Typography fontSize={[20, null, 20]} sx={{ marginTop: 2 }}>
         Threshold
       </Typography>
 
-      <Grid container>
-        <Grid>
-          <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: "1px solid #ced4da" }}>
-            {owners.map((owner, index) => (
-              <MenuItem key={owner} value={index + 1}>
-                {index + 1}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
+      <Grid sx={{ marginTop: 2 }}>
+        <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: "1px solid #ced4da" }}>
+          {owners.map((owner, index) => (
+            <MenuItem key={owner} value={index + 1}>
+              {index + 1}
+            </MenuItem>
+          ))}
+        </Select>
       </Grid>
 
       <Grid container sx={{ marginTop: "2vh", marginBottom: "2vh" }} onClick={handleOpenDialog}>
@@ -364,24 +370,21 @@ function Delegate() {
           ) : (
             <Alert severity="info" sx={{ marginTop: 2 }}>
               <Typography>
-                Proxy {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
+                Relayer will deploy proxy at address {getShortAddress(proxyAddress)}
               </Typography>
             </Alert>
           )}
         </div>
       ) : null}
 
-      {delegatee ? (
+      {delegatee && (
         <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
           <Typography>
             Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
             EOA storage will not be initialized if it is already setup.
           </Typography>
         </Alert>
-      ) : (
-        <Typography align="center">Account not delegated</Typography>
       )}
-
       <Button
         variant="contained"
         disabled={canSign || authorizations.length > 0}
@@ -406,48 +409,54 @@ function Delegate() {
 
       <Dialog open={openDialogTransactionStatus} onClose={() => setOpenDialogTransactionStatus(false)}>
         <Box sx={{ padding: 2 }}>
-          {transactionHash && (
-            <Typography align="center">
-              Transaction hash:&nbsp;
-              <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
-                {getShortTransactionHash(transactionHash)}
-              </Link>
-            </Typography>
-          )}
-
-          {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
-            <Typography align="center">Waiting for transaction to confirm</Typography>
-          ) : null}
-
-          {loading && (
-            <Grid container justifyContent="center">
-              <CircularProgress />
-            </Grid>
-          )}
-          {error && (
-            <Alert severity="error">
-              <Typography sx={{ color: "red" }}>{error}</Typography>
-            </Alert>
-          )}
-
-          {success && !error && (
-            <Grid container justifyContent="center" alignItems="center" size={12} sx={{marginTop: "2vh"}}>
-              <Grid size={12} justifyContent="center" alignItems="center">
-                <Button
-                fullWidth
-                  variant="contained"
-                  onClick={() => window.open(`${import.meta.env.VITE_SAFE_UI_URL}/home?safe=${account?.address}`, '_blank')}
-                >
-                  Go to Safe Wallet
-                </Button>
-              </Grid>
+          <Grid container justifyContent="center" alignItems="center" size={12} spacing={2}>
+            {transactionHash && (
               <Grid size={12}>
-                <Alert severity="success">
-                  <Typography sx={{ color: "white" }}>Transaction executed</Typography>
-                </Alert>
+                <Typography align="center">
+                  Transaction hash:&nbsp;
+                  <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
+                    {getShortTransactionHash(transactionHash)}
+                  </Link>
+                </Typography>
               </Grid>
-            </Grid>
-          )}
+            )}
+
+            {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
+              <Grid size={12}>
+                <Typography align="center">Waiting for transaction to confirm</Typography>
+              </Grid>
+            ) : null}
+
+            {loading && (
+              <Grid container justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            )}
+            {error && (
+              <Alert severity="error">
+                <Typography sx={{ color: "red" }}>{error}</Typography>
+              </Alert>
+            )}
+
+            {success && !error && (
+              <Grid container size={12}>
+                <Grid size={12}>
+                  <Alert severity="success">
+                    <Typography sx={{ color: "white" }}>Transaction executed. EOA now can be used in Safe wallet.</Typography>
+                  </Alert>
+                </Grid>
+                <Grid size={12} justifyContent="center" alignItems="center">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => window.open(`${import.meta.env.VITE_SAFE_UI_URL}/home?safe=${account?.address}`, '_blank')}
+                  >
+                    Go to Safe Wallet
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
         </Box>
       </Dialog>
 

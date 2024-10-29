@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppBar, Toolbar, Button, Typography, Box, IconButton, MenuItem, Menu, Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 import { WalletContext } from "../context/WalletContext";
-import ChangeAccountDialog from "./ChangeAccountDialog";
+import ChangeAccountDialog from "./dialogs/ChangeAccountDialog";
 import { safeEIP7702Config } from "../safe-eip7702-config/config";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
