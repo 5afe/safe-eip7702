@@ -5,6 +5,7 @@ import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/Sa
 import CompatibilityFallbackHandler from "@safe-global/safe-smart-account/build/artifacts/contracts/handler/CompatibilityFallbackHandler.sol/CompatibilityFallbackHandler.json";
 import MultiSendCallOnly from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSendCallOnly.sol/MultiSendCallOnly.json";
 import MultiSend from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSend.sol/MultiSend.json";
+import { Address } from "hardhat-deploy/types";
 
 export const getIDAFallbackHandler = async (): Promise<IDAFallbackHandler> => {
     const fallbackHandler = await hre.deployments.get("IDAFallbackHandler");
@@ -54,3 +55,12 @@ export const getMultiSend = async () => {
     const multiSend = await hre.deployments.get("MultiSend");
     return ethers.getContractAt(MultiSend.abi, multiSend.address);
 };
+
+export const getSafeLite = async () => {
+    const safeLite = await hre.deployments.get("SafeLite");
+    return ethers.getContractAt("SafeLite", safeLite.address);
+}
+
+export const getSafeLiteAtAddress = async (address: Address) => {
+    return ethers.getContractAt("SafeLite", address);
+}

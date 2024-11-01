@@ -62,6 +62,7 @@ const main = async () => {
     if (!isContract) {
         console.log(`Deploying Proxy [${proxyAddress}]`);
         const tx = await safeEIP7702ProxyFactory.connect(relayer).createProxyWithNonce(await safeSingleton.getAddress(), data, 0);
+        await tx.wait();
         console.log(`Proxy deployment transaction hash: [${tx.hash}]`);
     } else {
         console.log("Proxy already deployed: ", proxyAddress);

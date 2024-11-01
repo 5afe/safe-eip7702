@@ -84,7 +84,7 @@ function Delegate() {
     } else {
       setCanSign(true);
     }
-  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt, authorizations]);
+  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt, authorizations, delegatee]);
 
   useEffect(() => {
     if (proxyAddress) {
