@@ -25,15 +25,19 @@ import {
   Select,
   SelectChangeEvent,
   Box,
+  Tooltip,
+  Dialog,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { eip7702Actions } from "viem/experimental";
-import { getProxyAddress, getShortAddress } from "../utils/utils";
+import { getProxyAddress, getShortAddress, getShortTransactionHash } from "../utils/utils";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
 import DoneIcon from "@mui/icons-material/Done";
 import AddIcon from "@mui/icons-material/Add";
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import DefaultConfigurationDialog from "./dialogs/DefaultConfigurationDialog";
 
 declare global {
   interface BigInt {
@@ -65,21 +69,22 @@ function Delegate() {
   const [error, setError] = useState<string>();
   const [canSign, setCanSign] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openDialogTransactionStatus, setOpenDialogTransactionStatus] = useState<boolean>(false);
 
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
   useEffect(() => {
-    const newInitData = calculateInitData() as `0x${string}`;
-    setInitData(newInitData);
+    setInitData(calculateInitData() as `0x${string}`);
   }, [threshold, owners]);
 
   useEffect(() => {
-    if (!proxyAddress || isWaitingForTransactionHash || isWaitingForTransactionReceipt) {
-      setCanSign(true);
-    } else {
+    if (proxyAddress === undefined || isWaitingForTransactionHash || isWaitingForTransactionReceipt || authorizations.length > 0 || delegatee !== undefined) {
       setCanSign(false);
+    } else {
+      setCanSign(true);
     }
-  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt]);
+  }, [proxyAddress, isWaitingForTransactionHash, isWaitingForTransactionReceipt, authorizations, delegatee]);
 
   useEffect(() => {
     if (proxyAddress) {
@@ -101,19 +106,28 @@ function Delegate() {
   useEffect(() => {
     if (account) {
       (async () => {
-        const publicClient = createPublicClient({
-          transport: http(safeEIP7702Config[chainId].rpc),
-        });
 
-        const transactionCount = await publicClient.getTransactionCount({
-          address: account.address,
-        });
-        setNonce(transactionCount);
+        setOwners([account?.address]);
+        setThreshold(1);
+        setInitData(calculateInitData() as `0x${string}`);
 
-        setDelegatee(await publicClient.getCode({ address: account.address }));
+        try {
+          const publicClient = createPublicClient({
+            transport: http(safeEIP7702Config[chainId].rpc),
+          });
+
+          const transactionCount = await publicClient.getTransactionCount({
+            address: account.address,
+          });
+          setNonce(transactionCount);
+
+          setDelegatee(await publicClient.getCode({ address: account.address }));
+        } catch (e) {
+          console.error("RPC error", e);
+        }
       })();
     }
-  });
+  }, [account]);
 
   const walletClient = createWalletClient({
     transport: http(safeEIP7702Config[chainId].rpc),
@@ -175,6 +189,7 @@ function Delegate() {
   };
 
   const handleConvertToSmartAccount = async () => {
+    setOpenDialogTransactionStatus(true);
     setError(undefined);
     setSuccess(false);
 
@@ -255,91 +270,21 @@ function Delegate() {
     }
   };
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <Box>
-      <Typography variant="h3" align="left">
-        EIP-7702 Delegate Setup
+      <Typography variant="h1" align="left" fontSize={[44, null, 52]} sx={{ marginTop: 5 }}>
+        Account Setup
       </Typography>
 
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
-        Delegation Config
-      </Typography>
-
-      <Grid container size={12}>
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Proxy Factory</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{proxyFactory}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Safe Singleton</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.safeSingleton}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Fallback Handler</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Module Setup</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.moduleSetup}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Module</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{safeEIP7702Config[chainId]?.addresses.fallbackHandler}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>ChainID</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{chainId}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>Proxy Creation Salt</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{proxyCreationSalt.toString()}</Typography>
-          </Grid>
-        </Grid>
-
-        <Grid container size={12}>
-          <Grid size={4}>
-            <Typography>EOA nonce</Typography>
-          </Grid>
-          <Grid size={8}>
-            <Typography align="left">{nonce}</Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
+      <Typography fontSize={[20, null, 20]} sx={{ marginTop: 2 }}>
         Owners
       </Typography>
 
@@ -359,6 +304,11 @@ function Delegate() {
                   (!isAddress(owner) && "Invalid address") ||
                   (owners.indexOf(owner) !== owners.lastIndexOf(owner) && "Duplicate singer address")
                 }
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontFamily: 'monospace',
+                  },
+                }}
               />
             </Grid>
             <Grid size={2}>
@@ -374,54 +324,76 @@ function Delegate() {
         Add Signer
       </Button>
 
-      <Typography variant="h4" sx={{ marginTop: 3 }}>
+      <Typography fontSize={[20, null, 20]} sx={{ marginTop: 2 }}>
         Threshold
       </Typography>
 
-      <Grid container>
+      <Grid sx={{ marginTop: 2 }}>
+        <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: "1px solid #ced4da" }}>
+          {owners.map((owner, index) => (
+            <MenuItem key={owner} value={index + 1}>
+              {index + 1}
+            </MenuItem>
+          ))}
+        </Select>
+      </Grid>
+
+      <Grid container sx={{ marginTop: "2vh", marginBottom: "2vh" }} onClick={handleOpenDialog}>
         <Grid>
-          <Select value={threshold.toString()} onChange={handleThresholdChange} sx={{ border: "1px solid #ced4da" }}>
-            {owners.map((owner, index) => (
-              <MenuItem key={owner} value={index + 1}>
-                {index + 1}
-              </MenuItem>
-            ))}
-          </Select>
+          <Typography sx={{ textDecoration: 'underline', color: 'grey' }}
+          >
+            View other default configuration
+          </Typography>
+        </Grid>
+        <Grid sx={{ marginLeft: "10px" }}>
+          <Tooltip title="Click to view the default configuration details such as contract addresses, chainId and nonce">
+            <InfoOutlined sx={{ color: "grey" }} />
+          </Tooltip>
         </Grid>
       </Grid>
 
+      <DefaultConfigurationDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        proxyFactory={proxyFactory || ""}
+        safeSingleton={safeEIP7702Config[chainId]?.addresses.safeSingleton || ""}
+        fallbackHandler={safeEIP7702Config[chainId]?.addresses.fallbackHandler || ""}
+        moduleSetup={safeEIP7702Config[chainId]?.addresses.moduleSetup || ""}
+        chainId={chainId || 0}
+        proxyCreationSalt={proxyCreationSalt}
+        nonce={nonce}
+      />
+
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}
 
-      {proxyAddress ? (
+      {proxyAddress && delegatee === undefined ? (
         <div>
           {isProxyDeployed ? (
             <Alert>
-              <Typography color="primary">Proxy {getShortAddress(proxyAddress)} already deployed</Typography>
+              <Typography>Proxy <Typography component="code" sx={{ fontFamily: 'monospace' }}>{getShortAddress(proxyAddress)}</Typography> already deployed</Typography>
             </Alert>
           ) : (
             <Alert severity="info" sx={{ marginTop: 2 }}>
-              <Typography color="primary">
-                Proxy {getShortAddress(proxyAddress)} is not deployed. Relayer will deploy it.
+              <Typography>
+                Relayer will deploy proxy at address: <Typography component="code" sx={{ fontFamily: 'monospace' }}>{getShortAddress(proxyAddress)}</Typography>
               </Typography>
             </Alert>
           )}
         </div>
       ) : null}
 
-      {delegatee ? (
-        <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View storage</Link>}>
-          <Typography sx={{ color: "orange" }}>
-            Account already delegated to address: {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}.
-            EOA storage will not be initialized if it is already setup.
+      {delegatee && (
+        <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View more</Link>}>
+          <Typography>
+            Account already delegated to address: <Typography component="code" sx={{ fontFamily: 'monospace' }}>
+              {getShortAddress(("0x" + delegatee.slice(8)) as `0x${string}`)}
+            </Typography>
           </Typography>
         </Alert>
-      ) : (
-        <Typography align="center">Account not delegated</Typography>
       )}
-
       <Button
         variant="contained"
-        disabled={canSign || authorizations.length > 0}
+        disabled={!canSign}
         onClick={() => handleSignAuthorization(chainId)}
         sx={{ marginTop: 2 }}
         fullWidth
@@ -440,35 +412,66 @@ function Delegate() {
         Convert to smart account {error ? "(Try again)" : null}
       </Button>
 
-      {transactionHash && (
-        <Typography align="center">
-          Transaction hash:{" "}
-          <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
-            {transactionHash}
-          </Link>
-        </Typography>
-      )}
 
-      {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
-        <Typography align="center">Waiting for transaction to confirm</Typography>
-      ) : null}
+      <Dialog open={openDialogTransactionStatus} onClose={() => setOpenDialogTransactionStatus(false)}>
+        <Box sx={{ padding: 2 }}>
+          <Grid container justifyContent="center" alignItems="center" size={12} spacing={2}>
+            {transactionHash && (
+              <Grid size={12}>
+                <Typography align="center">
+                  Transaction hash:&nbsp;
+                  <Link target="_blank" rel="noreferrer" to={`${safeEIP7702Config[chainId].explorer}/tx/${transactionHash}`}>
+                    {getShortTransactionHash(transactionHash)}
+                  </Link>
+                </Typography>
+              </Grid>
+            )}
 
-      {loading && (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      )}
+            {isWaitingForTransactionHash || isWaitingForTransactionReceipt ? (
+              <Grid size={12}>
+                <Typography align="center">Waiting for transaction to confirm</Typography>
+              </Grid>
+            ) : null}
+
+            {loading && (
+              <Grid container justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            )}
+            {error && (
+              <Alert severity="error">
+                <Typography sx={{ color: "red" }}>{error}</Typography>
+              </Alert>
+            )}
+
+            {success && !error && (
+              <Grid container size={12}>
+                <Grid size={12}>
+                  <Alert severity="success">
+                    <Typography sx={{ color: "white" }}>Transaction executed. EOA now can be used in Safe wallet.</Typography>
+                  </Alert>
+                </Grid>
+                <Grid size={12} justifyContent="center" alignItems="center">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => window.open(`${import.meta.env.VITE_SAFE_UI_URL}/home?safe=${account?.address}`, '_blank')}
+                  >
+                    Go to Safe Wallet
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+      </Dialog>
+
       {error && (
         <Alert severity="error">
           <Typography sx={{ color: "red" }}>{error}</Typography>
         </Alert>
       )}
 
-      {success && !error && (
-        <Alert severity="success">
-          <Typography sx={{ color: "green" }}>Transaction executed</Typography>
-        </Alert>
-      )}
     </Box>
   );
 }

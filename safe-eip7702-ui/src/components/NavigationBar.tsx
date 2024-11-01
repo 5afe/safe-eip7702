@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppBar, Toolbar, Button, Typography, Box, IconButton, MenuItem, Menu, Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 import { WalletContext } from "../context/WalletContext";
-import ChangeAccountDialog from "./ChangeAccountDialog";
+import ChangeAccountDialog from "./dialogs/ChangeAccountDialog";
 import { safeEIP7702Config } from "../safe-eip7702-config/config";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
 import { checkRPCStatus } from "../api/api";
+import { getShortAddress } from "../utils/utils";
+import { zeroAddress } from "viem";
 
 const NavigationBar: React.FC = () => {
   const { isPrivateKeyValid, account, chainId, setChainId } = useContext(WalletContext)!;
@@ -58,13 +60,13 @@ const NavigationBar: React.FC = () => {
   }, [chainId]);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#000", borderBottom: "2px solid rgb(18, 255, 128)" }}>
+    <AppBar position="static" sx={{ borderBottom: "2px solid rgb(18, 255, 128)" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left Section: App Name and Buttons */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography
             variant="h6"
-            sx={{ color: "rgb(18, 255, 128)", fontFamily: '"Press Start 2P", monospace', marginRight: 4 }}
+            sx={{ marginRight: 4 }}
           >
             EOA--&gt;Safe
           </Typography>
@@ -100,14 +102,14 @@ const NavigationBar: React.FC = () => {
           <IconButton onClick={handleChainMenuOpen} color="inherit">
             {connected ? (
               <Tooltip title="connected">
-                <CheckCircleOutlineIcon color="success" sx={{ marginRight: "5px" }} />
+                <CheckCircleOutlineIcon sx={{ marginRight: "5px" }} />
               </Tooltip>
             ) : (
               <Tooltip title="Error connecting to rpc">
                 <ErrorIcon color="error" sx={{ marginRight: "5px" }} />
               </Tooltip>
             )}
-            <Typography color="primary">{safeEIP7702Config[chainId]?.name}</Typography>
+            <Typography>{safeEIP7702Config[chainId]?.name}</Typography>
           </IconButton>
           <Menu anchorEl={chainMenuAnchorEl} open={chainMenuOpen} onClose={handleChainMenuClose}>
             {Object.keys(safeEIP7702Config).map((chain) => (
@@ -119,8 +121,8 @@ const NavigationBar: React.FC = () => {
 
           {/* Account Info Menu */}
           <IconButton onClick={handleMenuOpen} color="inherit">
-            <Typography color="primary">
-              {account?.address.slice(0, 6)}...{account?.address.slice(-4)}
+            <Typography color="primary" component="code" sx={{ fontFamily: 'monospace' }}>
+              {getShortAddress(account?.address || zeroAddress)}
             </Typography>
           </IconButton>
           <Menu anchorEl={anchorEl} open={open} onClose={handleChangeClick}>

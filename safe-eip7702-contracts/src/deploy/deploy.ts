@@ -104,6 +104,13 @@ const deploy: DeployFunction = async ({ deployments, getNamedAccounts, network }
         log: true,
         deterministicDeployment: true,
     });
+
+    await deploy("SafeLite", {
+        from: deployer,
+        args: ["0x0000000071727de22e5e9d8baf0edac6f37da032"],
+        log: true,
+        deterministicDeployment: true,
+    });
 };
 
 export default deploy;

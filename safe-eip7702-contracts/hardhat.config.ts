@@ -20,10 +20,10 @@ const getPrivateKeys = () => {
 const privateKeys = getPrivateKeys();
 
 const sharedNetworkConfig: HttpNetworkUserConfig = {};
-if (privateKeys.length >= 3) {
+if (privateKeys.length >= 2) {
     sharedNetworkConfig.accounts = privateKeys;
 } else {
-    throw new Error("At least 3 private keys must be provided in .env");
+    throw new Error("At least 2 private keys must be provided in .env");
 }
 
 const customNetwork = CUSTOM_NODE_URL

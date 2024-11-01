@@ -27,6 +27,7 @@ const pectraDevnet = defineChain({
       webSocket: undefined,
     },
   },
+  testnet: true,
 });
 
 const pectraWalletClient = createWalletClient({
@@ -53,6 +54,7 @@ const customChain = defineChain({
       http: [process.env.RPC_URL_CUSTOM as string],
     },
   },
+  testnet: true
 });
 
 const customPublicClient = createPublicClient({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
-import WalletInput from './WalletInput';
+import WalletInput from '../WalletInput';
 
 interface DisconnectDialogProps {
   open: boolean;

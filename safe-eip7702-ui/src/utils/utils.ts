@@ -88,3 +88,7 @@ export const getDelegatedToAddress = async (
 export const getShortAddress = (address: Address): string => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+export const getShortTransactionHash = (address: Address): string => {
+    return `${address.slice(0, 10)}...${address.slice(-10)}`;
+}

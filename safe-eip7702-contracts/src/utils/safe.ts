@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
-import { SafeModuleSetup } from "../../typechain-types";
-import { AddressLike, ContractTransactionResponse, Provider, Signer } from "ethers";
+import { AddressLike, BigNumberish, ContractTransactionResponse, Provider, Signer } from "ethers";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
 import { ISafe } from "@safe-global/safe-smart-account/dist/typechain-types";
 
@@ -61,7 +60,7 @@ export const readMappingStorage = async (provider: Provider, account: AddressLik
     return await provider.getStorage(account, slot);
 };
 
-export const getSetupData = (owners: string[], threshold?: number, to?: string, modules?: string[], fallbackHandler?: string): string => {
+export const getSetupData = (owners: AddressLike[], threshold?: number, to?: AddressLike, modules?: AddressLike[], fallbackHandler?: AddressLike, paymentToken: AddressLike = ethers.ZeroAddress, payment: BigNumberish = 0, paymentReceiver: AddressLike = ethers.ZeroAddress): string => {
     const safeInterface = new ethers.Interface(SafeL2.abi);
     const safeModuleSetupInterface = new ethers.Interface(["function enableModules(address[])"]);
     return safeInterface.encodeFunctionData("setup", [
@@ -70,9 +69,9 @@ export const getSetupData = (owners: string[], threshold?: number, to?: string, 
         to || ethers.ZeroAddress,
         module !== undefined ? safeModuleSetupInterface.encodeFunctionData("enableModules", [modules]) : ethers.ZeroAddress,
         fallbackHandler || ethers.ZeroAddress,
-        ethers.ZeroAddress,
-        0,
-        ethers.ZeroAddress,
+        paymentToken,
+        payment,
+        paymentReceiver,
     ]);
 };
 

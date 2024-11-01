@@ -24,10 +24,6 @@ contract SafeLite {
     error InvalidSignature();
     error UnsupportedEntryPoint();
 
-    // EIP-712 Domain separator and type hash for the struct
-    bytes32 public constant DOMAIN_TYPEHASH =
-        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-
     constructor(address entryPoint) {
         ENTRY_POINT = entryPoint;
     }
@@ -69,7 +65,7 @@ contract SafeLite {
         uint256 nonce = $.nonce;
 
         // Calculate the hash of transactions data and nonce for signature verification
-        bytes32 domainSeparator = keccak256(abi.encode(DOMAIN_TYPEHASH, block.chainid, address(this)));
+        bytes32 domainSeparator = keccak256(abi.encode(_DOMAIN_TYPEHASH, block.chainid, address(this)));
         bytes32 structHash = keccak256(abi.encode(_MULTISEND_TYPEHASH, keccak256(transactions), nonce));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
 
