@@ -162,15 +162,13 @@ describe("SafeLite", () => {
             }
         });
 
-        // TODO: Fix this test
-        it.skip("Should magic value when signature is valid", async () => {
+        it("Should magic value when signature is valid", async () => {
             const { accountWallet } =
                 await setup();
 
             const safeLiteInstance = await getSafeLiteAtAddress(accountWallet.address);
             const hash = keccak256("0xdeadbeef");
             const signature = (accountWallet.signingKey).sign(ethers.toBeArray(hash));
-            console.log(signature.compactSerialized, await safeLiteInstance.isValidSignature.staticCall(hash, signature.compactSerialized));
             expect(await safeLiteInstance.isValidSignature.staticCall(hash, signature.compactSerialized)).to.equal("0x1626ba7e");
         });
 

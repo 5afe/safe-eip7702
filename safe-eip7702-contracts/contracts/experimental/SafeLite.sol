@@ -120,7 +120,7 @@ contract SafeLite {
         bool ok = _isValidSignature(hash, r, vs);
 
         assembly ("memory-safe") {
-            magicValue := mul(ok, 0x1626ba7e)
+            magicValue := shl(224, mul(ok, 0x1626ba7e))
         }
     }
 
