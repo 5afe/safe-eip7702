@@ -1,6 +1,7 @@
 
 export enum FEATURES {
-  SUPPORT_4337
+  SUPPORT_4337,
+  SAFE_WALLET
 }
 
 export const safeEIP7702Config: any = {
@@ -16,7 +17,7 @@ export const safeEIP7702Config: any = {
       multiSend: "0xd58De9D288831482346fA36e6bdc16925d9cFC85",
       multiSendCallOnly: "0x4873593fC8e788eFc06287327749fdDe08C0146b"
     },
-    features: []
+    features: [FEATURES.SAFE_WALLET]
   },
   [parseInt(import.meta.env.VITE_NETWORK_ID) || ""]: {
     rpc: import.meta.env.VITE_RPC_URL,
@@ -30,7 +31,7 @@ export const safeEIP7702Config: any = {
       multiSend: import.meta.env.VITE_MULTI_SEND,
       multiSendCallOnly: import.meta.env.VITE_MULTI_SEND_CALL_ONLY
     },
-    features: []
+    features: [FEATURES.SAFE_WALLET]
   },
   911867: {
     rpc: "https://odyssey.ithaca.xyz",
@@ -45,7 +46,7 @@ export const safeEIP7702Config: any = {
       multiSendCallOnly: "0x4873593fC8e788eFc06287327749fdDe08C0146b",
       safe4337Module: "0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226"
     },
-    features: [FEATURES.SUPPORT_4337]
+    features: [FEATURES.SAFE_WALLET, FEATURES.SUPPORT_4337]
   }
 };
 

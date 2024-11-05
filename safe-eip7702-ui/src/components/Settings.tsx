@@ -68,8 +68,10 @@ const Settings: React.FC = () => {
 
   return (
     <Box id="settings-gird-container">
-      <Grid>
-        <Typography variant="h4">Account storage</Typography>
+      <Grid size={12}>
+          <Typography variant="h1" align="left" fontSize={[44, null, 52]} sx={{ marginTop: 5 }}>
+            Account Storage
+          </Typography>
       </Grid>
       <Grid container size={12} justifyContent="center" alignItems="center" spacing={2}>
         <Grid size={10}>

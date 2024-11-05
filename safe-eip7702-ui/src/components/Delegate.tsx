@@ -11,7 +11,7 @@ import {
   zeroAddress,
 } from "viem";
 import { WalletContext } from "../context/WalletContext";
-import { safeEIP7702Config } from "../safe-eip7702-config/config";
+import { FEATURES, safeEIP7702Config } from "../safe-eip7702-config/config";
 import safeEIP7702Proxy from "../safe-eip7702-config/artifact/SafeEIP7702Proxy.json";
 import safeModuleSetup from "../safe-eip7702-config/artifact/SafeModuleSetup.json";
 import {
@@ -30,7 +30,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { eip7702Actions } from "viem/experimental";
-import { getProxyAddress, getShortAddress, getShortTransactionHash } from "../utils/utils";
+import { ACCOUNT_CODE_PREFIX, getProxyAddress, getShortAddress, getShortTransactionHash } from "../utils/utils";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { relayAuthorization } from "../api/api";
 import { Link } from "react-router-dom";
@@ -38,6 +38,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import AddIcon from "@mui/icons-material/Add";
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import DefaultConfigurationDialog from "./dialogs/DefaultConfigurationDialog";
+import GoToSafeWalletButton from './GoToSafeWalletButton';
 
 declare global {
   interface BigInt {
@@ -50,7 +51,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 function Delegate() {
-  const { authorizations, chainId, account, setAuthorizations } = useContext(WalletContext)!;
+  const { features, authorizations, chainId, account, setAuthorizations, safeStorage } = useContext(WalletContext)!;
 
   const [proxyAddress, setProxyAddress] = useState<`0x${string}`>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -74,6 +75,9 @@ function Delegate() {
 
   const proxyFactory = safeEIP7702Config[chainId]?.addresses.proxyFactory;
 
+  const isDelegatedToSafeAccount = () => {
+    return delegatee && safeStorage && safeStorage.singleton && isAddressEqual(safeEIP7702Config[chainId].addresses.safeSingleton, safeStorage.singleton);
+  }
   useEffect(() => {
     setInitData(calculateInitData() as `0x${string}`);
   }, [threshold, owners]);
@@ -121,7 +125,13 @@ function Delegate() {
           });
           setNonce(transactionCount);
 
-          setDelegatee(await publicClient.getCode({ address: account.address }));
+          const accountCode = await publicClient.getCode({ address: account.address });
+          if (accountCode && accountCode.startsWith(ACCOUNT_CODE_PREFIX)) {
+            setDelegatee(accountCode);
+          } else {
+            setDelegatee(undefined);
+          }
+
         } catch (e) {
           console.error("RPC error", e);
         }
@@ -382,7 +392,17 @@ function Delegate() {
         </div>
       ) : null}
 
-      {delegatee && (
+      {isDelegatedToSafeAccount() && (
+        <Alert severity="success" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View more</Link>}>
+          <Typography>
+            Account already delegated and uses Safe singleton: <Typography component="code" sx={{ fontFamily: 'monospace' }}>
+              {getShortAddress((safeStorage?.singleton || zeroAddress))}
+            </Typography>
+          </Typography>
+        </Alert>
+      )}
+
+      {delegatee && !isDelegatedToSafeAccount() && (
         <Alert severity="warning" sx={{ marginTop: 2 }} action={<Link to={"/settings"}>View more</Link>}>
           <Typography>
             Account already delegated to address: <Typography component="code" sx={{ fontFamily: 'monospace' }}>
@@ -391,6 +411,7 @@ function Delegate() {
           </Typography>
         </Alert>
       )}
+
       <Button
         variant="contained"
         disabled={!canSign}
@@ -412,6 +433,11 @@ function Delegate() {
         Convert to smart account {error ? "(Try again)" : null}
       </Button>
 
+      {isDelegatedToSafeAccount() && (
+        <Box sx={{ marginTop: 2 }}>
+          <GoToSafeWalletButton accountAddress={account?.address} />
+        </Box>
+      )}
 
       <Dialog open={openDialogTransactionStatus} onClose={() => setOpenDialogTransactionStatus(false)}>
         <Box sx={{ padding: 2 }}>
@@ -451,14 +477,30 @@ function Delegate() {
                     <Typography sx={{ color: "white" }}>Transaction executed. EOA now can be used in Safe wallet.</Typography>
                   </Alert>
                 </Grid>
-                <Grid size={12} justifyContent="center" alignItems="center">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() => window.open(`${import.meta.env.VITE_SAFE_UI_URL}/home?safe=${account?.address}`, '_blank')}
-                  >
-                    Go to Safe Wallet
-                  </Button>
+                <Grid container size={12} justifyContent="center" alignItems="center">
+                  {
+                    features.includes(FEATURES.SAFE_WALLET) &&
+                    <Grid size={6}>
+                      <GoToSafeWalletButton accountAddress={account?.address} />
+                    </Grid>
+                  }
+
+                  {
+                    features.includes(FEATURES.SUPPORT_4337) &&
+
+                    <Grid size={6}>
+                      <Button
+                        component={Link}
+                        fullWidth
+                        variant="contained"
+                        to="/batch"
+                      >
+                        Batch transactions
+                      </Button>
+                    </Grid>
+
+                  }
+
                 </Grid>
               </Grid>
             )}
