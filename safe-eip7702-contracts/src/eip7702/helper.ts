@@ -31,10 +31,11 @@ export const getSignedTransaction = async (
     authorizationList: AuthorizationListEntryAny[],
     to: AddressLike = ethers.ZeroAddress,
     value: ethers.BigNumberish = 0,
-    data: BytesLike = "0x"
+    data: BytesLike = "0x",
+    nonce?: number
 ) => {
     const relayerAddress = ethers.computeAddress(relayerSigningKey.publicKey);
-    const relayerNonce = await provider.getTransactionCount(relayerAddress);
+    const relayerNonce = nonce || await provider.getTransactionCount(relayerAddress);
     const tx = {
         from: relayerAddress,
         nonce: relayerNonce,

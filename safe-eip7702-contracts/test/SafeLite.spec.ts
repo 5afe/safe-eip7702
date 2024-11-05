@@ -25,9 +25,10 @@ describe("SafeLite", () => {
         const pkRelayer = process.env.PK2 || "";
         const relayerSigningKey = new SigningKey(pkRelayer);
 
-        if (await ethers.provider.getBalance(accountWallet.address) < ethers.parseEther("1")) {
+        const amount = 1_000_000_000_000
+        if (await ethers.provider.getBalance(accountWallet.address) < amount) {
             const relayerWallet = new ethers.Wallet(relayerSigningKey.privateKey, ethers.provider);
-            await (await relayerWallet.sendTransaction({ to: accountWallet.address, value: ethers.parseEther("1") })).wait();
+            await (await relayerWallet.sendTransaction({ to: accountWallet.address, value: amount })).wait();
         }
 
         return {
@@ -130,7 +131,7 @@ describe("SafeLite", () => {
             const { r, vs } = await getSignature(provider, accountWallet, encodedTx, nonce, accountAddress);
 
             const calldata = safeLite.interface.encodeFunctionData("multiSend", [encodedTx, r, vs]);
-            const encodedSignedTx = await getSignedTransaction(provider, new SigningKey(accountWallet.privateKey), authorizationList, accountAddress, 0, calldata);
+            const encodedSignedTx = await getSignedTransaction(provider, new SigningKey(accountWallet.privateKey), authorizationList, accountAddress, 0, calldata, nonce + 1);
 
             const accountBalanceBefore = await provider.getBalance(accountAddress);
 

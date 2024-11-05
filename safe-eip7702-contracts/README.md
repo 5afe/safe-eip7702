@@ -57,7 +57,6 @@ __Note:__ This contract does not implement any verification logic.
     npx hardhat run src/scripts/2_execute.ts --network pectra
 ```
 
-
 ### 3. Execute multi-send transaction
 ```bash
     npx hardhat run src/scripts/3_batch_execute.ts --network pectra
@@ -94,6 +93,14 @@ sequenceDiagram
     - Pro: No need of proxy deployment and proxy factory.
     - Con: EOA has to sign the initialization data. Compared to the proxy approach, this is an additional step for the EOA to sign the initialization data.
 
+2. **SafeLite**
+
+    - See: [./contracts/experimental/SafeLite.sol](./contracts/experimental/SafeLite.sol)
+    - A custom lite contract tailored for EIP-7702 which does not require any setup function.
+    - By default EOA is the only owner.
+    - Support batching transactions, smart contract signature verification (ERC-1271), ERC-4337.
+
 ### Useful links
 
 - [Pectra Faucet](https://faucet.pectra-4.ethpandaops.io/)
+- [Ithaca](https://app.conduit.xyz/published/view/odyssey)
