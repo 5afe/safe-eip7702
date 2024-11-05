@@ -64,12 +64,13 @@ const NavigationBar: React.FC = () => {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left Section: App Name and Buttons */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography
+            <Typography
             variant="h6"
-            sx={{ marginRight: 4 }}
-          >
+            sx={{ marginRight: 4, cursor: 'pointer' }}
+            onClick={() => window.location.href = '/'}
+            >
             EOA--&gt;Safe
-          </Typography>
+            </Typography>
 
           <Button
             component={Link}
@@ -93,6 +94,18 @@ const NavigationBar: React.FC = () => {
             }}
           >
             View Storage
+          </Button>
+
+          <Button
+            component={Link}
+            variant="contained"
+            to="/batch"
+            disabled={!isPrivateKeyValid}
+            sx={{
+              marginRight: 2,
+            }}
+          >
+            Batch
           </Button>
         </Box>
 

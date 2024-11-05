@@ -1,8 +1,8 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { isHex, PrivateKeyAccount } from 'viem'; // Import viem library for validation
 import { privateKeyToAccount } from 'viem/accounts';
 import { Authorization } from 'viem/experimental';
-import { defaultChainId } from '../safe-eip7702-config/config';
+import { defaultChainId, FEATURES, safeEIP7702Config } from '../safe-eip7702-config/config';
 
 interface WalletContextType {
   privateKey: `0x${string}` | undefined;
@@ -14,6 +14,7 @@ interface WalletContextType {
   setAuthorizations: (authorizations: Authorization[]) => void;
   chainId: number;
   setChainId: (chainId: number) => void;
+  features: FEATURES[];
 }
 
 // Create the context
@@ -26,6 +27,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [account, setAccount] = useState<PrivateKeyAccount>(privateKeyToAccount(import.meta.env.VITE_PRIVATE_KEY));
   const [authorizations, setAuthorizations] = useState<Authorization[]>([]);
   const [chainId, setChainId] = useState<number>(defaultChainId);
+  const [features, setFeatures] = useState<FEATURES[]>([]);
+
   // Function to validate the private key
   const validatePrivateKey = (key: `0x${string}` | undefined) => {
     if (key && key.startsWith('0x') && isHex(key) && key.length === 66) {
@@ -37,8 +40,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setPrivateKey(key as `0x${string}`);
   };
 
+  useEffect(()=>{
+    setFeatures(safeEIP7702Config[chainId].features)
+  }, [chainId]);
+
+
   return (
-    <WalletContext.Provider value={{ chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>
+    <WalletContext.Provider value={{ features, chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>
       {children}
     </WalletContext.Provider>
   );
