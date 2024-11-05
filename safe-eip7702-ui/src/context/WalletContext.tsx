@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
-import { Address, createPublicClient, getContract, http, isAddress, isAddressEqual, isHex, PrivateKeyAccount, PublicClient } from 'viem'; // Import viem library for validation
+import { Address, Chain, createPublicClient, defineChain, getContract, http, isAddress, isAddressEqual, isHex, PrivateKeyAccount, PublicClient } from 'viem'; // Import viem library for validation
 import { privateKeyToAccount } from 'viem/accounts';
 import { Authorization } from 'viem/experimental';
 import { defaultChainId, FEATURES, safeEIP7702Config } from '../safe-eip7702-config/config';
@@ -37,6 +37,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [loading, setLoading] = useState<boolean>(false);
   const [safeStorage, setSafeStorage] = useState<SafeStorage>();
   const [accountCode, setAccountCode] = useState<string>();
+  const [chain, setChain] = useState<Chain>();
+
   const [publicClient, setPublicClient] = useState<PublicClient>(createPublicClient({
     transport: http(safeEIP7702Config[chainId].rpc),
   }));
@@ -54,9 +56,30 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     setFeatures(safeEIP7702Config[chainId].features)
+
+    const chain = defineChain({
+      id: chainId,
+      name: safeEIP7702Config[chainId].name,
+      nativeCurrency: {
+        name: "Ethereum",
+        symbol: "ETH",
+        decimals: 18,
+      },
+      rpcUrls: {
+        default: {
+          http: [safeEIP7702Config[chainId].rpc as string],
+          webSocket: undefined,
+        },
+      },
+      testnet: safeEIP7702Config[chainId].testnet,
+    });
+
+    setChain(chain);
     setPublicClient(createPublicClient({
+      chain: chain,
       transport: http(safeEIP7702Config[chainId].rpc),
     }));
+
   }, [chainId]);
 
   const loadStorage = async () => {
@@ -97,8 +120,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       await loadStorage();
     })();
   }, [account]);
-
-
 
   return (
     <WalletContext.Provider value={{ safeStorage, accountCode, loading, publicClient, features, chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>

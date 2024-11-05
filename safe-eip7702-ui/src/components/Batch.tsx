@@ -6,10 +6,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { WalletContext } from '../context/WalletContext';
 import { FEATURES, safeEIP7702Config } from '../safe-eip7702-config/config';
-import { createPublicClient, Hex, http, isAddress, isHex, zeroAddress } from 'viem';
+import { Hex, http, isAddress, isHex, zeroAddress } from 'viem';
 import { toSafeSmartAccount } from 'permissionless/accounts';
 import { createSmartAccountClient } from 'permissionless';
-import { odysseyTestnet } from "viem/chains"
 import { UserOperationCall } from 'viem/account-abstraction';
 
 enum BatchError {
@@ -39,11 +38,6 @@ const Batch: React.FC = () => {
 
     const pimlicoClient = createPimlicoClient({
       transport: http(pimlicoUrl),
-    })
-
-    const publicClient = createPublicClient({
-      chain: odysseyTestnet,
-      transport: http("https://odyssey.ithaca.xyz"),
     })
 
     if (safeStorage && safeStorage.owners && account && safeStorage.owners.includes(account.address) && safeStorage.threshold === 1n) {

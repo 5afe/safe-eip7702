@@ -14,8 +14,6 @@ const Settings: React.FC = () => {
   const [safeStorage, setSafeStorage] = React.useState<SafeStorage>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [accountCode, setAccountCode] = React.useState<string>();
-  const [owners, setOwners] = React.useState<string[]>();
-  const [modules, setModules] = React.useState<string[]>();
   const [isDelegated, setIsDelegated] = React.useState<boolean>(false);
   const [isDelegatedToSafeSingleton, setIsDelegatedToSafeSingleton] = React.useState<boolean>(false);
 
@@ -43,18 +41,18 @@ const Settings: React.FC = () => {
         client: publicClient,
       });
 
-      const owners = ((await contract.read.getOwners()) as string[]) || [];
-      setOwners(owners);
+      const owners = ((await contract.read.getOwners()) as Address[]) || [];
+      storage.owners = owners;
 
       const modulesResult = (await contract.read.getModulesPaginated([SENTINEL_ADDRESS, 10])) as string[][];
       if (modulesResult && modulesResult.length > 0) {
-        const modules = modulesResult[0].map((module: string) => module);
-        setModules(modules);
+        const modules = modulesResult[0] as Address[];
+        storage.modules = modules;
       }
     } else {
       setIsDelegatedToSafeSingleton(false);
-      setOwners(undefined);
-      setModules(undefined);
+      storage.modules = [];
+      storage.owners = [];
     }
 
     setAccountCode(accountCode);
@@ -160,7 +158,7 @@ const Settings: React.FC = () => {
               <Typography>Owners</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{owners?.map((owner) => <Grid key={owner}>{owner}</Grid>)}</Typography>
+              <Typography align="left">{safeStorage?.owners?.map((owner) => <Grid key={owner}>{owner}</Grid>)}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -168,7 +166,7 @@ const Settings: React.FC = () => {
               <Typography>Modules</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{modules?.map((module) => <Grid key={module}>{module}</Grid>)}</Typography>
+              <Typography align="left">{safeStorage?.modules?.map((module) => <Grid key={module}>{module}</Grid>)}</Typography>
             </Grid>
           </Grid>
         </Grid>
