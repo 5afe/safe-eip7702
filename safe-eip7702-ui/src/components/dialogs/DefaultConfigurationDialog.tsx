@@ -42,7 +42,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Proxy Factory</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{proxyFactory}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{proxyFactory}</Typography>
             </Grid>
           </Grid>
 
@@ -51,7 +51,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Safe Singleton</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeSingleton}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeSingleton}</Typography>
             </Grid>
           </Grid>
 
@@ -60,7 +60,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Fallback Handler</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{fallbackHandler}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{fallbackHandler}</Typography>
             </Grid>
           </Grid>
 
@@ -69,7 +69,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Module Setup</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{moduleSetup}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{moduleSetup}</Typography>
             </Grid>
           </Grid>
 
@@ -78,7 +78,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Module</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{fallbackHandler}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{fallbackHandler}</Typography>
             </Grid>
           </Grid>
 
@@ -87,7 +87,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>ChainID</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{chainId}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{chainId}</Typography>
             </Grid>
           </Grid>
 
@@ -96,7 +96,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>Proxy Creation Salt</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{proxyCreationSalt.toString()}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{proxyCreationSalt.toString()}</Typography>
             </Grid>
           </Grid>
 
@@ -105,7 +105,7 @@ const DefaultConfigurationDialog: React.FC<DefaultConfigurationDialogProps> = ({
               <Typography>EOA nonce</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{nonce}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{nonce}</Typography>
             </Grid>
           </Grid>
         </Grid>

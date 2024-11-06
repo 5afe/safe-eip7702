@@ -69,9 +69,9 @@ const Settings: React.FC = () => {
   return (
     <Box id="settings-gird-container">
       <Grid size={12}>
-          <Typography variant="h1" align="left" fontSize={[44, null, 52]} sx={{ marginTop: 5 }}>
-            Account Storage
-          </Typography>
+        <Typography variant="h1" align="left" fontSize={[44, null, 52]} sx={{ marginTop: 5 }}>
+          Account Storage
+        </Typography>
       </Grid>
       <Grid container size={12} justifyContent="center" alignItems="center" spacing={2}>
         <Grid size={10}>
@@ -84,6 +84,11 @@ const Settings: React.FC = () => {
             margin="normal"
             error={!isAddress(accountAddress)}
             helperText={!isAddress(accountAddress) && "Invalid address"}
+            sx={{
+              '& .MuiInputBase-input': {
+                fontFamily: 'monospace',
+              },
+            }}
           />
         </Grid>
         <Grid size={2} justifyContent="center" alignItems="center">
@@ -112,7 +117,7 @@ const Settings: React.FC = () => {
               <Typography>Safe Singleton</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.singleton}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.singleton}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -120,7 +125,7 @@ const Settings: React.FC = () => {
               <Typography>Fallbackhandler</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.fallbackHandler}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.fallbackHandler}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -128,7 +133,7 @@ const Settings: React.FC = () => {
               <Typography>Threshold</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.threshold.toString()}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.threshold.toString()}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -136,7 +141,7 @@ const Settings: React.FC = () => {
               <Typography>Safe nonce</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.nonce.toString()}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.nonce.toString()}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -144,7 +149,7 @@ const Settings: React.FC = () => {
               <Typography>Owner count</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.ownerCount.toString()}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.ownerCount.toString()}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -152,7 +157,7 @@ const Settings: React.FC = () => {
               <Typography>Delegatee</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{isDelegated && accountCode ? "0x" + accountCode.slice(8) : ""}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{isDelegated && accountCode ? "0x" + accountCode.slice(8) : ""}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -160,7 +165,7 @@ const Settings: React.FC = () => {
               <Typography>Owners</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.owners?.map((owner) => <Grid key={owner}>{owner}</Grid>)}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.owners?.map((owner) => <Grid key={owner}>{owner}</Grid>)}</Typography>
             </Grid>
           </Grid>
           <Grid container size={12}>
@@ -168,7 +173,7 @@ const Settings: React.FC = () => {
               <Typography>Modules</Typography>
             </Grid>
             <Grid size={8}>
-              <Typography align="left">{safeStorage?.modules?.map((module) => <Grid key={module}>{module}</Grid>)}</Typography>
+              <Typography component="code" sx={{ fontFamily: 'monospace' }} align="left">{safeStorage?.modules?.map((module) => <Grid key={module}>{module}</Grid>)}</Typography>
             </Grid>
           </Grid>
         </Grid>

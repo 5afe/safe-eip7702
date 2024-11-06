@@ -145,6 +145,11 @@ const Batch: React.FC = () => {
                     error={!isAddress(transaction.to)}
                     helperText={!isAddress(transaction.to) ? 'Invalid address' : ''}
                     fullWidth
+                    sx={{
+                      '& .MuiInputBase-input': {
+                        fontFamily: 'monospace',
+                      },
+                    }}
                   />
                 </Grid>
                 <Grid size={4}>
@@ -164,6 +169,11 @@ const Batch: React.FC = () => {
                     error={!isHex(transaction.data)}
                     helperText={!isHex(transaction.data) ? 'Invalid hex data' : ''}
                     fullWidth
+                    sx={{
+                      '& .MuiInputBase-input': {
+                        fontFamily: 'monospace',
+                      },
+                    }}
                   />
                 </Grid>
               </Grid>
