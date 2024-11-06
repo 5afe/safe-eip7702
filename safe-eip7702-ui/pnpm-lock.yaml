@@ -23,6 +23,9 @@ importers:
       '@tanstack/react-query':
         specifier: 5.45.1
         version: 5.45.1(react@18.3.1)
+      permissionless:
+        specifier: ^0.2.15
+        version: 0.2.15(viem@2.21.34(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8))
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -3593,6 +3596,11 @@ packages:
 
   pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
+
+  permissionless@0.2.15:
+    resolution: {integrity: sha512-S5+FP9e6xY7AEC+9w4mJ66826Cn7gHqHxKMFopevM2+ZPTpYpvYnB4APLljNsCfuIqMVNutTbgcuLZTasNvMEQ==}
+    peerDependencies:
+      viem: ^2.21.22
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -8854,6 +8862,10 @@ snapshots:
   path-type@4.0.0: {}
 
   pathe@1.1.2: {}
+
+  permissionless@0.2.15(viem@2.21.34(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8)):
+    dependencies:
+      viem: 2.21.34(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.23.8)
 
   picocolors@1.1.1: {}
 

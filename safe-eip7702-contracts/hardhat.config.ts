@@ -74,6 +74,11 @@ const config: HardhatUserConfig = {
             gas: 1_000_000_000,
             timeout: 100000000,
         },
+        ithaca:{
+            ...sharedNetworkConfig,
+            url: "https://odyssey.ithaca.xyz",
+            timeout: 100000000,
+        },
         ...customNetwork,
     },
     solidity: {

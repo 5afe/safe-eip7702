@@ -1,0 +1,207 @@
+{
+  "address": "0xc36578ed6328ad8892D078B1d3487336D1C4db3b",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "entryPoint",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidSignature",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnsupportedEntryPoint",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "hash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "signature",
+          "type": "bytes"
+        }
+      ],
+      "name": "isValidSignature",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "magicValue",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "transactions",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "r",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vs",
+          "type": "uint256"
+        }
+      ],
+      "name": "multiSend",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "accountGasLimits",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "gasFees",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterAndData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct PackedUserOperation",
+          "name": "userOp",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "userOpHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "missingAccountFunds",
+          "type": "uint256"
+        }
+      ],
+      "name": "validateUserOp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "validationData",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xf2e40b5915c08319886bd4f51a3a50d69e4698f4cc1d2a5505f5dae635c5e3a3",
+  "receipt": {
+    "to": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+    "from": "0x779F8fcbd0227f5874576605243Cb06D3Bf62768",
+    "contractAddress": null,
+    "transactionIndex": 8,
+    "gasUsed": "469027",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x58d0afd5060b2c6a1f4921148538b07dd97b3dc13c86aaa25aa33521468d7558",
+    "transactionHash": "0xf2e40b5915c08319886bd4f51a3a50d69e4698f4cc1d2a5505f5dae635c5e3a3",
+    "logs": [],
+    "blockNumber": 105887,
+    "cumulativeGasUsed": "637027",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x0000000071727de22e5e9d8baf0edac6f37da032"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "c594096b4c3b565e51b97d6c61f73415",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.27+commit.40a35a09\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"entryPoint\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"InvalidSignature\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UnsupportedEntryPoint\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"hash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"isValidSignature\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"magicValue\",\"type\":\"bytes4\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"r\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"vs\",\"type\":\"uint256\"}],\"name\":\"multiSend\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"accountGasLimits\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"gasFees\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct PackedUserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"userOpHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"missingAccountFunds\",\"type\":\"uint256\"}],\"name\":\"validateUserOp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"validationData\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"isValidSignature(bytes32,bytes)\":{\"details\":\"ERC-1271: Validates if the provided signature is valid for the given hash.\",\"params\":{\"hash\":\"The hash of the signed data.\",\"signature\":\"The signature to validate.\"},\"returns\":{\"magicValue\":\"The ERC-1271 magic value (0x1626ba7e) if the signature is valid, 0x00000000 otherwise.\"}},\"multiSend(bytes,uint256,uint256)\":{\"details\":\"Sends multiple transactions with signature validation and reverts all if one fails.\",\"params\":{\"r\":\"The r part of the signature.\",\"transactions\":\"Encoded transactions.\",\"vs\":\"The v and s part of the signature.\"}}},\"title\":\"SafeLite - A lite version of Safe with multi-send functionality. The contract uses only storage slot 0 to track nonce.                   The contract is intended to be used with EIP-7702 where EOA delegates to this contract.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/experimental/SafeLite.sol\":\"SafeLite\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000000},\"remappings\":[]},\"sources\":{\"@account-abstraction/contracts/interfaces/PackedUserOperation.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity >=0.7.5;\\n\\n/**\\n * User Operation struct\\n * @param sender                - The sender account of this request.\\n * @param nonce                 - Unique value the sender uses to verify it is not a replay.\\n * @param initCode              - If set, the account contract will be created by this constructor/\\n * @param callData              - The method call to execute on this account.\\n * @param accountGasLimits      - Packed gas limits for validateUserOp and gas limit passed to the callData method call.\\n * @param preVerificationGas    - Gas not calculated by the handleOps method, but added to the gas paid.\\n *                                Covers batch overhead.\\n * @param gasFees               - packed gas fields maxPriorityFeePerGas and maxFeePerGas - Same as EIP-1559 gas parameters.\\n * @param paymasterAndData      - If set, this field holds the paymaster address, verification gas limit, postOp gas limit and paymaster-specific extra data\\n *                                The paymaster will pay for the transaction instead of the sender.\\n * @param signature             - Sender-verified signature over the entire request, the EntryPoint address and the chain ID.\\n */\\nstruct PackedUserOperation {\\n    address sender;\\n    uint256 nonce;\\n    bytes initCode;\\n    bytes callData;\\n    bytes32 accountGasLimits;\\n    uint256 preVerificationGas;\\n    bytes32 gasFees;\\n    bytes paymasterAndData;\\n    bytes signature;\\n}\\n\",\"keccak256\":\"0x1129b46381db68eddbc5cb49e50664667b66b03c480453858e7b25eabe444359\",\"license\":\"GPL-3.0\"},\"contracts/experimental/SafeLite.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity ^0.8.26;\\n\\nimport {PackedUserOperation} from \\\"@account-abstraction/contracts/interfaces/PackedUserOperation.sol\\\";\\n\\n/**\\n * @title SafeLite - A lite version of Safe with multi-send functionality. The contract uses only storage slot 0 to track nonce.\\n *                   The contract is intended to be used with EIP-7702 where EOA delegates to this contract.\\n */\\ncontract SafeLite {\\n    struct Storage {\\n        uint256 nonce;\\n    }\\n\\n    // keccak256(\\\"SafeLite\\\") & (~0xff)\\n    bytes32 private constant _STORAGE = 0xf391af0813284e31898752ae6d86b2fba2f5b7957123c9689e204dd75b30e800;\\n    // keccak256(\\\"EIP712Domain(uint256 chainId,address verifyingContract)\\\");\\n    bytes32 private constant _DOMAIN_TYPEHASH = 0x47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218;\\n    // keccak256(\\\"MultiSend(bytes32 data,uint256 nonce)\\\")\\n    bytes32 private constant _MULTISEND_TYPEHASH = 0x4b62daad5ffa0b659a63c2970c5ece817f1135bfe9848c40eedd738724987890;\\n\\n    address private immutable ENTRY_POINT;\\n\\n    error InvalidSignature();\\n    error UnsupportedEntryPoint();\\n\\n    constructor(address entryPoint) {\\n        ENTRY_POINT = entryPoint;\\n    }\\n\\n    /**\\n     * @notice Validates the call is initiated by the entry point.\\n     */\\n    modifier onlySupportedEntryPoint() {\\n        if (msg.sender != ENTRY_POINT) {\\n            revert UnsupportedEntryPoint();\\n        }\\n        _;\\n    }\\n\\n    function validateUserOp(\\n        PackedUserOperation calldata userOp,\\n        bytes32 userOpHash,\\n        uint256 missingAccountFunds\\n    ) external onlySupportedEntryPoint returns (uint256 validationData) {\\n        (uint256 r, uint256 vs) = abi.decode(userOp.signature, (uint256, uint256));\\n        bool ok = _isValidSignature(userOpHash, r, vs);\\n\\n        assembly (\\\"memory-safe\\\") {\\n            validationData := add(not(ok), 2) // branchless madnesss, good thing this isn't production code!\\n            if missingAccountFunds {\\n                pop(call(gas(), caller(), missingAccountFunds, 0, 0, 0, 0))\\n            }\\n        }\\n    }\\n\\n    /**\\n     * @dev Sends multiple transactions with signature validation and reverts all if one fails.\\n     * @param transactions Encoded transactions.\\n     * @param r The r part of the signature.\\n     * @param vs The v and s part of the signature.\\n     */\\n    function multiSend(bytes memory transactions, uint256 r, uint256 vs) public payable {\\n        Storage storage $ = _storage();\\n        uint256 nonce = $.nonce;\\n\\n        // Calculate the hash of transactions data and nonce for signature verification\\n        bytes32 domainSeparator = keccak256(abi.encode(_DOMAIN_TYPEHASH, block.chainid, address(this)));\\n        bytes32 structHash = keccak256(abi.encode(_MULTISEND_TYPEHASH, keccak256(transactions), nonce));\\n        bytes32 digest = keccak256(abi.encodePacked(\\\"\\\\x19\\\\x01\\\", domainSeparator, structHash));\\n\\n        // Verify the signature\\n        require(_isValidSignature(digest, r, vs), InvalidSignature());\\n\\n        // Update nonce for the sender to prevent replay attacks\\n        unchecked {\\n            $.nonce = nonce + 1;\\n        }\\n\\n        /* solhint-disable no-inline-assembly */\\n        assembly (\\\"memory-safe\\\") {\\n            let length := mload(transactions)\\n            let i := 0x20\\n            for {\\n\\n            } lt(i, length) {\\n\\n            } {\\n                let operation := shr(0xf8, mload(add(transactions, i)))\\n                let to := shr(0x60, mload(add(transactions, add(i, 0x01))))\\n                let value := mload(add(transactions, add(i, 0x15)))\\n                let dataLength := mload(add(transactions, add(i, 0x35)))\\n                let data := add(transactions, add(i, 0x55))\\n                let success := 0\\n                switch operation\\n                case 0 {\\n                    success := call(gas(), to, value, data, dataLength, 0, 0)\\n                }\\n                case 1 {\\n                    success := delegatecall(gas(), to, data, dataLength, 0, 0)\\n                }\\n                if eq(success, 0) {\\n                    returndatacopy(0, 0, returndatasize())\\n                    revert(0, returndatasize())\\n                }\\n                i := add(i, add(0x55, dataLength))\\n            }\\n        }\\n        /* solhint-enable no-inline-assembly */\\n    }\\n\\n    /**\\n     * @dev ERC-1271: Validates if the provided signature is valid for the given hash.\\n     * @param hash The hash of the signed data.\\n     * @param signature The signature to validate.\\n     * @return magicValue The ERC-1271 magic value (0x1626ba7e) if the signature is valid, 0x00000000 otherwise.\\n     */\\n    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4 magicValue) {\\n        (uint256 r, uint256 vs) = abi.decode(signature, (uint256, uint256));\\n        bool ok = _isValidSignature(hash, r, vs);\\n\\n        assembly (\\\"memory-safe\\\") {\\n            magicValue := mul(ok, hex\\\"1626ba7e\\\")\\n        }\\n    }\\n\\n    /**\\n     * @dev Validates the signature by extracting `v` and `s` from `vs` and using `ecrecover`.\\n     * @param hash The hash of the signed data.\\n     * @param r The r part of the signature.\\n     * @param vs The v and s part of the signature combined.\\n     * @return bool True if the signature is valid, false otherwise.\\n     */\\n    function _isValidSignature(bytes32 hash, uint256 r, uint256 vs) internal view returns (bool) {\\n        unchecked {\\n            uint256 v = (vs >> 255) + 27;\\n            uint256 s = vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;\\n            return address(this) == ecrecover(hash, uint8(v), bytes32(r), bytes32(s));\\n        }\\n    }\\n\\n    function _storage() private pure returns (Storage storage $) {\\n        assembly (\\\"memory-safe\\\") {\\n            $.slot := _STORAGE\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xdc186c154a0b5b0608158a739670a9b413808deb8baaa34b8c4478fb5f7924bb\",\"license\":\"LGPL-3.0-only\"}},\"version\":1}",
+  "bytecode": "0x60a0604052348015600f57600080fd5b50604051610807380380610807833981016040819052602c91603c565b6001600160a01b0316608052606a565b600060208284031215604d57600080fd5b81516001600160a01b0381168114606357600080fd5b9392505050565b608051610782610085600039600061014201526107826000f3fe6080604052600436106100345760003560e01c80631626ba7e1461003957806319822f7c1461008f578063e425bf34146100bd575b600080fd5b34801561004557600080fd5b506100596100543660046105b1565b6100d2565b6040517fffffffff0000000000000000000000000000000000000000000000000000000090911681526020015b60405180910390f35b34801561009b57600080fd5b506100af6100aa3660046105f8565b610128565b604051908152602001610086565b6100d06100cb36600461064c565b6101ed565b005b6000806000838060200190518101906100eb919061069a565b9150915060006100fc8684846103ea565b7f1626ba7e00000000000000000000000000000000000000000000000000000000029695505050505050565b60003373ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001614610199576040517f85db247d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6000806101aa6101008701876106be565b8101906101b7919061072a565b9150915060006101c88684846103ea565b90506002811901935084156101e35760008060008088335af1505b5050509392505050565b7ff391af0813284e31898752ae6d86b2fba2f5b7957123c9689e204dd75b30e8008054604080517f47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218602080830191909152468284015230606080840191909152835180840390910181526080830184528051908201208851898301207f4b62daad5ffa0b659a63c2970c5ece817f1135bfe9848c40eedd73872498789060a085015260c084015260e0808401869052845180850390910181526101008401909452835193909101929092207f190100000000000000000000000000000000000000000000000000000000000061012083015261012282018390526101428201819052906000906101620160405160208183030381529060405280519060200120905061031a8188886103ea565b610350576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600184018555875160205b818110156103de57808a015160f81c600182018b015160601c601583018c0151603584018d0151605585018e01600085600081146103a057600181146103b0576103bb565b6000808585888a5af191506103bb565b6000808585895af491505b50806103cb573d6000803e3d6000fd5b505080605501850194505050505061035b565b50505050505050505050565b6040805160008082526020820180845286905260ff84811c601b0190811693830193909352606082018590527f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff84166080830181905290929160019060a0016020604051602081039080840390855afa15801561046b573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015173ffffffffffffffffffffffffffffffffffffffff163014979650505050505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600082601f8301126104f657600080fd5b813567ffffffffffffffff811115610510576105106104b6565b6040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0603f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f8501160116810181811067ffffffffffffffff8211171561057c5761057c6104b6565b60405281815283820160200185101561059457600080fd5b816020850160208301376000918101602001919091529392505050565b600080604083850312156105c457600080fd5b82359150602083013567ffffffffffffffff8111156105e257600080fd5b6105ee858286016104e5565b9150509250929050565b60008060006060848603121561060d57600080fd5b833567ffffffffffffffff81111561062457600080fd5b8401610120818703121561063757600080fd5b95602085013595506040909401359392505050565b60008060006060848603121561066157600080fd5b833567ffffffffffffffff81111561067857600080fd5b610684868287016104e5565b9660208601359650604090950135949350505050565b600080604083850312156106ad57600080fd5b505080516020909101519092909150565b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe18436030181126106f357600080fd5b83018035915067ffffffffffffffff82111561070e57600080fd5b60200191503681900382131561072357600080fd5b9250929050565b6000806040838503121561073d57600080fd5b5050803592602090910135915056fea26469706673582212200c1007354a4ee2d9be891d90f45e7d8949cc29efa7e4932658cb21472c79133064736f6c634300081b0033",
+  "deployedBytecode": "0x6080604052600436106100345760003560e01c80631626ba7e1461003957806319822f7c1461008f578063e425bf34146100bd575b600080fd5b34801561004557600080fd5b506100596100543660046105b1565b6100d2565b6040517fffffffff0000000000000000000000000000000000000000000000000000000090911681526020015b60405180910390f35b34801561009b57600080fd5b506100af6100aa3660046105f8565b610128565b604051908152602001610086565b6100d06100cb36600461064c565b6101ed565b005b6000806000838060200190518101906100eb919061069a565b9150915060006100fc8684846103ea565b7f1626ba7e00000000000000000000000000000000000000000000000000000000029695505050505050565b60003373ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001614610199576040517f85db247d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6000806101aa6101008701876106be565b8101906101b7919061072a565b9150915060006101c88684846103ea565b90506002811901935084156101e35760008060008088335af1505b5050509392505050565b7ff391af0813284e31898752ae6d86b2fba2f5b7957123c9689e204dd75b30e8008054604080517f47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218602080830191909152468284015230606080840191909152835180840390910181526080830184528051908201208851898301207f4b62daad5ffa0b659a63c2970c5ece817f1135bfe9848c40eedd73872498789060a085015260c084015260e0808401869052845180850390910181526101008401909452835193909101929092207f190100000000000000000000000000000000000000000000000000000000000061012083015261012282018390526101428201819052906000906101620160405160208183030381529060405280519060200120905061031a8188886103ea565b610350576040517f8baa579f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600184018555875160205b818110156103de57808a015160f81c600182018b015160601c601583018c0151603584018d0151605585018e01600085600081146103a057600181146103b0576103bb565b6000808585888a5af191506103bb565b6000808585895af491505b50806103cb573d6000803e3d6000fd5b505080605501850194505050505061035b565b50505050505050505050565b6040805160008082526020820180845286905260ff84811c601b0190811693830193909352606082018590527f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff84166080830181905290929160019060a0016020604051602081039080840390855afa15801561046b573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015173ffffffffffffffffffffffffffffffffffffffff163014979650505050505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b600082601f8301126104f657600080fd5b813567ffffffffffffffff811115610510576105106104b6565b6040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0603f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f8501160116810181811067ffffffffffffffff8211171561057c5761057c6104b6565b60405281815283820160200185101561059457600080fd5b816020850160208301376000918101602001919091529392505050565b600080604083850312156105c457600080fd5b82359150602083013567ffffffffffffffff8111156105e257600080fd5b6105ee858286016104e5565b9150509250929050565b60008060006060848603121561060d57600080fd5b833567ffffffffffffffff81111561062457600080fd5b8401610120818703121561063757600080fd5b95602085013595506040909401359392505050565b60008060006060848603121561066157600080fd5b833567ffffffffffffffff81111561067857600080fd5b610684868287016104e5565b9660208601359650604090950135949350505050565b600080604083850312156106ad57600080fd5b505080516020909101519092909150565b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe18436030181126106f357600080fd5b83018035915067ffffffffffffffff82111561070e57600080fd5b60200191503681900382131561072357600080fd5b9250929050565b6000806040838503121561073d57600080fd5b5050803592602090910135915056fea26469706673582212200c1007354a4ee2d9be891d90f45e7d8949cc29efa7e4932658cb21472c79133064736f6c634300081b0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "isValidSignature(bytes32,bytes)": {
+        "details": "ERC-1271: Validates if the provided signature is valid for the given hash.",
+        "params": {
+          "hash": "The hash of the signed data.",
+          "signature": "The signature to validate."
+        },
+        "returns": {
+          "magicValue": "The ERC-1271 magic value (0x1626ba7e) if the signature is valid, 0x00000000 otherwise."
+        }
+      },
+      "multiSend(bytes,uint256,uint256)": {
+        "details": "Sends multiple transactions with signature validation and reverts all if one fails.",
+        "params": {
+          "r": "The r part of the signature.",
+          "transactions": "Encoded transactions.",
+          "vs": "The v and s part of the signature."
+        }
+      }
+    },
+    "title": "SafeLite - A lite version of Safe with multi-send functionality. The contract uses only storage slot 0 to track nonce.                   The contract is intended to be used with EIP-7702 where EOA delegates to this contract.",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}

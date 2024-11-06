@@ -120,10 +120,17 @@ contract SafeLite {
         bool ok = _isValidSignature(hash, r, vs);
 
         assembly ("memory-safe") {
-            magicValue := mul(ok, 0x1626ba7e)
+            magicValue := mul(ok, hex"1626ba7e")
         }
     }
 
+    /**
+     * @dev Validates the signature by extracting `v` and `s` from `vs` and using `ecrecover`.
+     * @param hash The hash of the signed data.
+     * @param r The r part of the signature.
+     * @param vs The v and s part of the signature combined.
+     * @return bool True if the signature is valid, false otherwise.
+     */
     function _isValidSignature(bytes32 hash, uint256 r, uint256 vs) internal view returns (bool) {
         unchecked {
             uint256 v = (vs >> 255) + 27;

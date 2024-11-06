@@ -1,4 +1,4 @@
-import { ethers, keccak256, Provider, Signer, SigningKey } from "ethers";
+import { AddressLike, BytesLike, ethers, keccak256, Provider, Signer, SigningKey } from "ethers";
 import { AuthorizationListEntryAny, encodeRLPAuthorizationEntryUnsigned, serializeEip7702 } from "../utils/encodeRLP";
 import { SafeEIP7702ProxyFactory } from "../../typechain-types";
 
@@ -29,17 +29,21 @@ export const getSignedTransaction = async (
     provider: Provider,
     relayerSigningKey: SigningKey,
     authorizationList: AuthorizationListEntryAny[],
+    to: AddressLike = ethers.ZeroAddress,
+    value: ethers.BigNumberish = 0,
+    data: BytesLike = "0x",
+    nonce?: number
 ) => {
     const relayerAddress = ethers.computeAddress(relayerSigningKey.publicKey);
-    const relayerNonce = await provider.getTransactionCount(relayerAddress);
+    const relayerNonce = nonce || await provider.getTransactionCount(relayerAddress);
     const tx = {
         from: relayerAddress,
         nonce: relayerNonce,
         gasLimit: ethers.toBeHex(21000000),
         gasPrice: ethers.toBeHex(3100),
-        data: "0x",
-        to: ethers.ZeroAddress,
-        value: 0,
+        data: data,
+        to: to,
+        value: value,
         chainId: (await provider.getNetwork()).chainId,
         type: 4,
         maxFeePerGas: ethers.toBeHex(30000),

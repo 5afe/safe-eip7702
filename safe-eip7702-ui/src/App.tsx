@@ -8,6 +8,7 @@ import Home from './components/home/Home';
 import { WalletProvider } from './context/WalletContext';
 import NavigationBar from './components/NavigationBar';
 import SafeThemeProvider from './theme/SafeThemeProvider';
+import Batch from './components/Batch';
 
 const App: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/delegate" element={<Delegate />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/batch" element={<Batch />} />
                   <Route path="/" element={<Home />} />
                 </Routes>
               </Container>
