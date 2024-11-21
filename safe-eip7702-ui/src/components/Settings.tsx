@@ -25,7 +25,6 @@ const Settings: React.FC = () => {
     if (!account || !isAddress(accountAddress)) return;
     setLoading(true);
     const storage = await readStorage(publicClient, accountAddress);
-    console.log(`Storage values for account [${accountAddress}]:`, storage);
     const accountCode = await publicClient.getCode({ address: accountAddress });
 
     if (accountCode && accountCode.startsWith(ACCOUNT_CODE_PREFIX)) {

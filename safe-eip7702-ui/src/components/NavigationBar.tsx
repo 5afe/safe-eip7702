@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppBar, Toolbar, Button, Typography, Box, IconButton, MenuItem, Menu, Tooltip } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { WalletContext } from "../context/WalletContext";
 import ChangeAccountDialog from "./dialogs/ChangeAccountDialog";
 import { safeEIP7702Config } from "../safe-eip7702-config/config";
@@ -11,6 +11,9 @@ import { getShortAddress } from "../utils/utils";
 import { zeroAddress } from "viem";
 
 const NavigationBar: React.FC = () => {
+
+  const navigate = useNavigate();
+
   const { isPrivateKeyValid, account, chainId, setChainId } = useContext(WalletContext)!;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [chainMenuAnchorEl, setChainMenuAnchorEl] = React.useState<null | HTMLElement>(null); // State for chain selection menu
@@ -64,13 +67,13 @@ const NavigationBar: React.FC = () => {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left Section: App Name and Buttons */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
+          <Typography
             variant="h6"
             sx={{ marginRight: 4, cursor: 'pointer' }}
-            onClick={() => window.location.href = '/'}
-            >
+            onClick={() => navigate("/")}
+          >
             EOA--&gt;Safe
-            </Typography>
+          </Typography>
 
           <Button
             component={Link}
@@ -138,7 +141,7 @@ const NavigationBar: React.FC = () => {
               {getShortAddress(account?.address || zeroAddress)}
             </Typography>
           </IconButton>
-          <Menu anchorEl={anchorEl} open={open} onClose={handleChangeClick}>
+          <Menu anchorEl={anchorEl} open={open} onClose={() => handleMenuClose()}>
             <MenuItem onClick={handleChangeClick}>Change</MenuItem>
           </Menu>
         </Box>
