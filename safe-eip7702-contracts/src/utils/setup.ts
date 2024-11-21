@@ -2,6 +2,7 @@ import hre, { ethers } from "hardhat";
 import { IDAFallbackHandler, ISafe } from "../../typechain-types";
 import SafeProxyFactory from "@safe-global/safe-smart-account/build/artifacts/contracts/proxies/SafeProxyFactory.sol/SafeProxyFactory.json";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
+import SafeEIP7702L2 from "@safe-global/safe-smart-account/build/artifacts/contracts/experimental/SafeEIP7702L2.sol/SafeEIP7702L2.json";
 import CompatibilityFallbackHandler from "@safe-global/safe-smart-account/build/artifacts/contracts/handler/CompatibilityFallbackHandler.sol/CompatibilityFallbackHandler.json";
 import MultiSendCallOnly from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSendCallOnly.sol/MultiSendCallOnly.json";
 import MultiSend from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSend.sol/MultiSend.json";
@@ -15,6 +16,11 @@ export const getIDAFallbackHandler = async (): Promise<IDAFallbackHandler> => {
 export const getSafeSingleton = async () => {
     const safe = await hre.deployments.get("SafeL2");
     return ethers.getContractAt(SafeL2.abi, safe.address);
+};
+
+export const getSafeEIP7702Singleton = async () => {
+    const safe = await hre.deployments.get("SafeEIP7702L2");
+    return ethers.getContractAt(SafeEIP7702L2.abi, safe.address);
 };
 
 export const getSafeAtAddress = async (address: string): Promise<ISafe> => {

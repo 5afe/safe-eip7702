@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
-import { AddressLike, BigNumberish, ContractTransactionResponse, Provider, Signer } from "ethers";
+import { AddressLike, BigNumberish, ContractTransactionResponse, Provider, Signer, Wallet, ZeroAddress } from "ethers";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
+import SafeEIP7702L2 from "@safe-global/safe-smart-account/build/artifacts/contracts/experimental/SafeEIP7702L2.sol/SafeEIP7702L2.json";
 import { ISafe } from "@safe-global/safe-smart-account/dist/typechain-types";
 
 export const execTransaction = async (
@@ -74,6 +75,30 @@ export const getSetupData = (owners: AddressLike[], threshold?: number, to?: Add
         paymentReceiver,
     ]);
 };
+
+export const getSetupDataForSingleton = async (wallet: Wallet, to: AddressLike = ZeroAddress, modules: AddressLike[] = [], fallbackHandler: AddressLike = ZeroAddress, paymentToken: AddressLike = ZeroAddress, payment: BigNumberish = 0, paymentReceiver: AddressLike = ethers.ZeroAddress): Promise<string> => {
+    const safeInterface = new ethers.Interface(SafeEIP7702L2.abi);
+    const safeModuleSetupInterface = new ethers.Interface(["function enableModules(address[])"]);
+    const data = modules !== undefined ? safeModuleSetupInterface.encodeFunctionData("enableModules", [modules]) : ethers.ZeroAddress;
+
+    const dataHash = ethers.keccak256(ethers.AbiCoder.defaultAbiCoder().encode(
+        ["address", "bytes", "address", "address", "uint256", "address"],
+        [to, data, fallbackHandler, paymentToken, payment, paymentReceiver]
+    ));
+
+    const signatures = await wallet.signMessage(dataHash);
+
+    return safeInterface.encodeFunctionData("setupEIP7702", [
+        to,
+        data,
+        fallbackHandler,
+        paymentToken,
+        payment,
+        paymentReceiver,
+        signatures.replace(/1b$/, "1f").replace(/1c$/, "20")
+    ]);
+};
+
 
 export const FALLBACK_HANDLER_STORAGE_SLOT = "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5";
 export const GUARD_STORAGE_SLOT = "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8";

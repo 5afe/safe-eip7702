@@ -2,6 +2,7 @@ import MultiSend from "@safe-global/safe-smart-account/build/artifacts/contracts
 import MultiSendCallOnly from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/MultiSendCallOnly.sol/MultiSendCallOnly.json";
 import SafeProxyFactory from "@safe-global/safe-smart-account/build/artifacts/contracts/proxies/SafeProxyFactory.sol/SafeProxyFactory.json";
 import SafeL2 from "@safe-global/safe-smart-account/build/artifacts/contracts/SafeL2.sol/SafeL2.json";
+import SafeEIP7702L2 from "@safe-global/safe-smart-account/build/artifacts/contracts/experimental/SafeEIP7702L2.sol/SafeEIP7702L2.json";
 import SignMessageLib from "@safe-global/safe-smart-account/build/artifacts/contracts/libraries/SignMessageLib.sol/SignMessageLib.json";
 import SimulateTxAccessor from "@safe-global/safe-smart-account/build/artifacts/contracts/accessors/SimulateTxAccessor.sol/SimulateTxAccessor.json";
 import CompatibilityFallbackHandler from "@safe-global/safe-smart-account/build/artifacts/contracts/handler/CompatibilityFallbackHandler.sol/CompatibilityFallbackHandler.json";
@@ -60,6 +61,14 @@ const deploy: DeployFunction = async ({ deployments, getNamedAccounts, network }
     await deploy("SafeL2", {
         from: deployer,
         contract: SafeL2,
+        args: [],
+        log: true,
+        deterministicDeployment: true,
+    });
+
+    await deploy("SafeEIP7702L2", {
+        from: deployer,
+        contract: SafeEIP7702L2,
         args: [],
         log: true,
         deterministicDeployment: true,
