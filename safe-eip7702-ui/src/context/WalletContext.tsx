@@ -20,7 +20,8 @@ interface WalletContextType {
   publicClient: PublicClient;
   loading: boolean,
   safeStorage: SafeStorage | undefined,
-  accountCode: string | undefined
+  accountCode: string | undefined,
+  loadStorage: () => Promise<void>;
 }
 
 // Create the context
@@ -91,7 +92,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
     setLoading(true);
     let storage = await readStorage(publicClient, accountAddress);
-    console.log(`Storage values for account [${accountAddress}]:`, storage);
     const accountCode = await publicClient.getCode({ address: accountAddress });
 
     if (isAddressEqual(storage.singleton, safeEIP7702Config[chainId].addresses.safeSingleton)) {
@@ -122,7 +122,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, [account]);
 
   return (
-    <WalletContext.Provider value={{ safeStorage, accountCode, loading, publicClient, features, chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>
+    <WalletContext.Provider value={{ loadStorage, safeStorage, accountCode, loading, publicClient, features, chainId, setChainId, authorizations, setAuthorizations, privateKey, setPrivateKey: validatePrivateKey, isPrivateKeyValid, account, setAccount }}>
       {children}
     </WalletContext.Provider>
   );

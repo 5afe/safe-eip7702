@@ -51,7 +51,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 function Delegate() {
-  const { features, authorizations, chainId, account, setAuthorizations, safeStorage } = useContext(WalletContext)!;
+  const { loadStorage, features, authorizations, chainId, account, setAuthorizations, safeStorage } = useContext(WalletContext)!;
 
   const [proxyAddress, setProxyAddress] = useState<`0x${string}`>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -235,6 +235,7 @@ function Delegate() {
         console.error("Failed to execute transaction", e);
         setError("Failed to execute transaction");
       }
+      await loadStorage();
       setIsWaitingForTransactionReceipt(false);
     } else {
       setError("Failed to relay authorization");
