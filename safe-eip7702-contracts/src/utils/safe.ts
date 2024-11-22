@@ -86,7 +86,7 @@ export const getSetupDataForSingleton = async (wallet: Wallet, to: AddressLike =
         [to, data, fallbackHandler, paymentToken, payment, paymentReceiver]
     ));
 
-    const signatures = await wallet.signMessage(dataHash);
+    const signatures = await wallet.signMessage(ethers.getBytes((dataHash)));
 
     return safeInterface.encodeFunctionData("setupEIP7702", [
         to,
