@@ -1,5 +1,5 @@
-import { Address } from "viem";
-import { AuthorizationList } from "viem/experimental";
+import { Address } from 'viem'
+import { AuthorizationList } from 'viem/experimental'
 
 export const relayAuthorization = async (
   authorizationList: AuthorizationList,
@@ -9,58 +9,58 @@ export const relayAuthorization = async (
 ): Promise<any> => {
   try {
     const response = await fetch(import.meta.env.VITE_BACKEND_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      authorizationList,
-      initData,
-      from,
-      proxyFactory
-    }),
-  });
-  return await response.json()
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        authorizationList,
+        initData,
+        from,
+        proxyFactory
+      })
+    })
+    return await response.json()
   } catch (error) {
-    console.error("Failed to relay authorization:", error);
+    console.error('Failed to relay authorization:', error)
     return {
       error: error
-    };
+    }
   }
-};
+}
 
 export const checkRPCStatus = async (rpcUrl: string): Promise<boolean> => {
   const data = {
-    jsonrpc: "2.0",
-    id: "1",
-    method: "web3_clientVersion",
-    params: null,
-  };
+    jsonrpc: '2.0',
+    id: '1',
+    method: 'web3_clientVersion',
+    params: null
+  }
 
   try {
     const response = await fetch(rpcUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
-    });
+      body: JSON.stringify(data)
+    })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const json = await response.json();
+    const json = await response.json()
 
     // Check if there's a result in the response
     if (json.result) {
-      return true;
+      return true
     } else {
-      console.log("Error in RPC response:", json.error || "Unknown error");
-      return false;
+      console.log('Error in RPC response:', json.error || 'Unknown error')
+      return false
     }
   } catch (error) {
-    console.error("Failed to connect to the Ethereum RPC:", error);
-    return false;
+    console.error('Failed to connect to the Ethereum RPC:', error)
+    return false
   }
-};
+}

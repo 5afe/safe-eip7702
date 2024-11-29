@@ -1,76 +1,91 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AppBar, Toolbar, Button, Typography, Box, IconButton, MenuItem, Menu, Tooltip } from "@mui/material";
-import { Link } from "react-router-dom";
-import { WalletContext } from "../context/WalletContext";
-import ChangeAccountDialog from "./dialogs/ChangeAccountDialog";
-import { safeEIP7702Config } from "../safe-eip7702-config/config";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorIcon from "@mui/icons-material/Error";
-import { checkRPCStatus } from "../api/api";
-import { getShortAddress } from "../utils/utils";
-import { zeroAddress } from "viem";
+import React, { useContext, useEffect, useState } from 'react'
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  MenuItem,
+  Menu,
+  Tooltip
+} from '@mui/material'
+import { Link } from 'react-router-dom'
+import { WalletContext } from '../context/WalletContext'
+import ChangeAccountDialog from './dialogs/ChangeAccountDialog'
+import { safeEIP7702Config } from '../safe-eip7702-config/config'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ErrorIcon from '@mui/icons-material/Error'
+import { checkRPCStatus } from '../api/api'
+import { getShortAddress } from '../utils/utils'
+import { zeroAddress } from 'viem'
 
 const NavigationBar: React.FC = () => {
-  const { isPrivateKeyValid, account, chainId, setChainId } = useContext(WalletContext)!;
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [chainMenuAnchorEl, setChainMenuAnchorEl] = React.useState<null | HTMLElement>(null); // State for chain selection menu
-  const open = Boolean(anchorEl);
-  const chainMenuOpen = Boolean(chainMenuAnchorEl);
-  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false); // State for controlling the dialog
-  const [connected, setConnected] = useState(false);
+  const { isPrivateKeyValid, account, chainId, setChainId } =
+    useContext(WalletContext)!
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [chainMenuAnchorEl, setChainMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null) // State for chain selection menu
+  const open = Boolean(anchorEl)
+  const chainMenuOpen = Boolean(chainMenuAnchorEl)
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false) // State for controlling the dialog
+  const [connected, setConnected] = useState(false)
 
   // Handle main menu open/close
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   // Handle chain menu open/close
   const handleChainMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setChainMenuAnchorEl(event.currentTarget);
-  };
+    setChainMenuAnchorEl(event.currentTarget)
+  }
 
   const handleChainMenuClose = () => {
-    setChainMenuAnchorEl(null);
-  };
+    setChainMenuAnchorEl(null)
+  }
 
   const handleChainSelect = (selectedChainId: string) => {
-    setChainId(parseInt(selectedChainId)); // Update the selected chainId in context
-    handleChainMenuClose(); // Close the chain selection menu
-  };
+    setChainId(parseInt(selectedChainId)) // Update the selected chainId in context
+    handleChainMenuClose() // Close the chain selection menu
+  }
 
   const handleChangeClick = () => {
-    handleMenuClose(); // Close the menu first
-    setDisconnectDialogOpen(true); // Open the dialog
-  };
+    handleMenuClose() // Close the menu first
+    setDisconnectDialogOpen(true) // Open the dialog
+  }
 
   const handleDisconnectConfirm = () => {
-    setDisconnectDialogOpen(false);
-  };
+    setDisconnectDialogOpen(false)
+  }
 
   useEffect(() => {
-    (async () => {
-      const rpcUrl = safeEIP7702Config[chainId].rpc;
-      const isLive = await checkRPCStatus(rpcUrl);
-      setConnected(isLive);
-    })();
-  }, [chainId]);
+    ;(async () => {
+      const rpcUrl = safeEIP7702Config[chainId].rpc
+      const isLive = await checkRPCStatus(rpcUrl)
+      setConnected(isLive)
+    })()
+  }, [chainId])
 
   return (
-    <AppBar position="static" sx={{ borderBottom: "2px solid rgb(18, 255, 128)" }}>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
+    <AppBar
+      position="static"
+      sx={{ borderBottom: '2px solid rgb(18, 255, 128)' }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
         {/* Left Section: App Name and Buttons */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
             variant="h6"
             sx={{ marginRight: 4, cursor: 'pointer' }}
-            onClick={() => window.location.href = '/'}
-            >
+            onClick={() => (window.location.href = '/')}
+          >
             EOA--&gt;Safe
-            </Typography>
+          </Typography>
 
           <Button
             component={Link}
@@ -78,7 +93,7 @@ const NavigationBar: React.FC = () => {
             variant="contained"
             disabled={!isPrivateKeyValid}
             sx={{
-              marginRight: 2,
+              marginRight: 2
             }}
           >
             Delegate
@@ -90,7 +105,7 @@ const NavigationBar: React.FC = () => {
             to="/settings"
             disabled={!isPrivateKeyValid}
             sx={{
-              marginRight: 2,
+              marginRight: 2
             }}
           >
             View Storage
@@ -102,7 +117,7 @@ const NavigationBar: React.FC = () => {
             to="/batch"
             disabled={!isPrivateKeyValid}
             sx={{
-              marginRight: 2,
+              marginRight: 2
             }}
           >
             Batch
@@ -115,16 +130,20 @@ const NavigationBar: React.FC = () => {
           <IconButton onClick={handleChainMenuOpen} color="inherit">
             {connected ? (
               <Tooltip title="connected">
-                <CheckCircleOutlineIcon sx={{ marginRight: "5px" }} />
+                <CheckCircleOutlineIcon sx={{ marginRight: '5px' }} />
               </Tooltip>
             ) : (
               <Tooltip title="Error connecting to rpc">
-                <ErrorIcon color="error" sx={{ marginRight: "5px" }} />
+                <ErrorIcon color="error" sx={{ marginRight: '5px' }} />
               </Tooltip>
             )}
             <Typography>{safeEIP7702Config[chainId]?.name}</Typography>
           </IconButton>
-          <Menu anchorEl={chainMenuAnchorEl} open={chainMenuOpen} onClose={handleChainMenuClose}>
+          <Menu
+            anchorEl={chainMenuAnchorEl}
+            open={chainMenuOpen}
+            onClose={handleChainMenuClose}
+          >
             {Object.keys(safeEIP7702Config).map((chain) => (
               <MenuItem key={chain} onClick={() => handleChainSelect(chain)}>
                 {safeEIP7702Config[chain].name} ({chain})
@@ -134,7 +153,11 @@ const NavigationBar: React.FC = () => {
 
           {/* Account Info Menu */}
           <IconButton onClick={handleMenuOpen} color="inherit">
-            <Typography color="primary" component="code" sx={{ fontFamily: 'monospace' }}>
+            <Typography
+              color="primary"
+              component="code"
+              sx={{ fontFamily: 'monospace' }}
+            >
               {getShortAddress(account?.address || zeroAddress)}
             </Typography>
           </IconButton>
@@ -150,7 +173,7 @@ const NavigationBar: React.FC = () => {
         onConfirm={handleDisconnectConfirm}
       />
     </AppBar>
-  );
-};
+  )
+}
 
-export default NavigationBar;
+export default NavigationBar

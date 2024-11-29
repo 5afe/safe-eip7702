@@ -1,7 +1,7 @@
-import { defineChain } from "viem";
-import { http, createConfig } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
-import { coinbaseWallet, injected } from "wagmi/connectors";
+import { defineChain } from 'viem'
+import { http, createConfig } from 'wagmi'
+import { mainnet, sepolia } from 'wagmi/chains'
+import { coinbaseWallet, injected } from 'wagmi/connectors'
 
 // export const pectraDevnet = defineChain({
 //   id: 7042905162,
@@ -23,18 +23,18 @@ export const config = createConfig({
   chains: [mainnet, sepolia],
   connectors: [
     injected(),
-    coinbaseWallet(),
+    coinbaseWallet()
     // walletConnect({ projectId: import.meta.env.VITE_WC_PROJECT_ID }),
   ],
   transports: {
     [mainnet.id]: http(),
-    [sepolia.id]: http(),
-   // [pectraDevnet.id]: http(),
-  },
-});
+    [sepolia.id]: http()
+    // [pectraDevnet.id]: http(),
+  }
+})
 
-declare module "wagmi" {
+declare module 'wagmi' {
   interface Register {
-    config: typeof config;
+    config: typeof config
   }
 }
