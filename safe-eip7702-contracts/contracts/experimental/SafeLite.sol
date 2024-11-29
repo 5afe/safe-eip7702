@@ -81,11 +81,7 @@ contract SafeLite {
         assembly ("memory-safe") {
             let length := mload(transactions)
             let i := 0x20
-            for {
-
-            } lt(i, length) {
-
-            } {
+            for {} lt(i, length) {} {
                 let operation := shr(0xf8, mload(add(transactions, i)))
                 let to := shr(0x60, mload(add(transactions, add(i, 0x01))))
                 let value := mload(add(transactions, add(i, 0x15)))
