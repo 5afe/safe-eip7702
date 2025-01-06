@@ -7,7 +7,7 @@ export const safeEIP7702Addresses: any = {
       name: "pectra-devnet",
       explorer: "https://explorer.pectra-devnet-4.ethpandaops.io",  
       proxyFactory: "0xE60EcE6588DCcFb7373538034963B4D20a280DB0",
-      safeSingleton: "0xCfaA26AD40bFC7E3b1642E1888620FC402b95dAB",
+      safeSingleton: "0x18F2d1EB128e64fE5EDcCa6A0Fa7702Aa44cf664",
       fallbackHandler: "0x4fFeBe9E5af056a73555223E9319Ae94D43461C0",
       moduleSetup: "0x2204DcA7d254897ae6d815D2189032db87F50Bba",
       multiSend: "0xd58De9D288831482346fA36e6bdc16925d9cFC85",
